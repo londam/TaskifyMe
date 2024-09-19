@@ -13,9 +13,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" data-theme="bumblebee">
-      <body className="flex">
-        <SideBar></SideBar>
-        <main className="p-5">{children}</main>
+      <body>
+        <div className="flex flex-row">
+          <SideBar></SideBar>
+          <main className="p-5">{children}</main>
+        </div>
       </body>
     </html>
   );

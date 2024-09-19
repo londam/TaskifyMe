@@ -8,7 +8,7 @@ const AudiosPage = () => {
       <div>AudiosPage</div>
       <FileUpload />
       <div className="min-h-screen bg-base-100 flex items-center justify-center">
-        {/* <AudioPlayer src="/copy_2.mp3" /> */}
+        <AudioPlayer audioFileId="66ec8a92604436ea8d02e9de" />
       </div>
     </>
   );

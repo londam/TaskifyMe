@@ -4,7 +4,7 @@ import { deleteFile, getFile, getFileList, uploadFile } from "@/app/lib/webdisk"
 // Mock function to get user _id (You'd replace this with your actual logic)
 const getUserId = async (request: Request): Promise<string> => {
   // Mock user ID (replace with actual user fetching logic)
-  return process.env.NEXT_USER_ID as string; // Should be dynamically fetched
+  return process.env.NEXT_PUBLIC_USER_ID as string; // Should be dynamically fetched
 };
 
 // Function to generate a timestamp in YYYY-MM-DD-HH-mm-ss format

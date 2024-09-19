@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 
-const userId = process.env.NEXT_USER_ID;
-
 const FileUpload = () => {
+  const userId = process.env.NEXT_PUBLIC_USER_ID;
+
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +45,7 @@ const FileUpload = () => {
         return;
       }
 
-      const fileUrl = uploadData.url;
+      const fileUrl = uploadData.fileUrl;
 
       // Step 2: Update database with file URL
       const updateResponse = await fetch("/api/audios", {

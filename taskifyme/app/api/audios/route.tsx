@@ -6,6 +6,8 @@ import { UserModel, AudioFileModel } from "@/app/lib/mongodb/models"; // Import 
 export async function POST(request: NextRequest) {
   try {
     const { fileUrl, userId } = await request.json();
+    console.log("fileUrl", fileUrl);
+    console.log("userId", userId);
 
     if (!fileUrl || !userId) {
       return NextResponse.json({ error: "Missing fileUrl or userId" }, { status: 400 });

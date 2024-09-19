@@ -2,10 +2,10 @@
 import { useState, useRef, useEffect } from "react";
 //
 interface Props {
-  src: string;
+  audioFileId: string;
 }
 //
-export default function AudioPlayer({ src }: Props) {
+export default function AudioPlayer({ audioFileId }: Props) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [volume, setVolume] = useState(1); // Volume between 0 and 1 (default is 1)

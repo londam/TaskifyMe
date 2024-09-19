@@ -13,7 +13,8 @@
     "next": "14.2.12",
     "react": "^18",
     "react-dom": "^18",
-    "webdav": "^5.7.1"
+    "webdav": "^5.7.1",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20",

@@ -6,7 +6,7 @@ const AudiosPage = () => {
   return (
     <>
       <div>AudiosPage</div>
-      {/* <FileUpload /> */}
+      <FileUpload />
       <div className="min-h-screen bg-base-100 flex items-center justify-center">
         <AudioPlayer src="/copy_2.mp3" />
       </div>

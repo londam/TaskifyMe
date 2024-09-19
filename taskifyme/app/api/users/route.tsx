@@ -42,11 +42,16 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   //in RL fetch data from a db,
   await dbConnect(); // Ensure database connection is established
-  const user = await UserModel.find();
+  const users = await UserModel.find();
 
-  //if not found return 404
-  // else return data
-  if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+  try {
+    // Fetch all users, selecting only the _id, name, and email fields, excluding password, audios, and stt
+    const users = await UserModel.find().select("_id name email");
 
-  return NextResponse.json(user, { status: 200 });
+    // Return the users with only the selected fields
+    return NextResponse.json(users, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }

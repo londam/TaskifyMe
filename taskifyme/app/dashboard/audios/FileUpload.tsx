@@ -1,10 +1,8 @@
-// components/FileUpload.tsx
-
 "use client";
 
 import { useState } from "react";
 
-const FileUpload: React.FC = () => {
+const FileUpload = () => {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,15 +45,17 @@ const FileUpload: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center p-4 bg-base-200 rounded-lg shadow-lg">
-      <input
-        type="file"
-        accept="audio/*"
-        onChange={handleFileChange}
-        className="file-input file-input-bordered file-input-primary w-full max-w-xs mb-4"
-      />
-      <button onClick={handleUpload} className="btn btn-primary" disabled={uploading || !file}>
-        {uploading ? "Uploading..." : "Upload"}
-      </button>
+      <div className="flex flex-row items-center p-1 ">
+        <input
+          type="file"
+          accept="audio/*"
+          onChange={handleFileChange}
+          className="file-input file-input-bordered file-input-primary w-full max-w-xs mr-3"
+        />
+        <button onClick={handleUpload} className="btn btn-primary" disabled={uploading || !file}>
+          {uploading ? "Uploading..." : "Upload"}
+        </button>
+      </div>
       {error && <p className="text-red-500 mt-2">{error}</p>}
     </div>
   );

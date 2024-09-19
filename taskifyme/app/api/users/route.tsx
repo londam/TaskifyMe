@@ -38,3 +38,15 @@ export async function POST(request: NextRequest) {
     }
   }
 }
+
+export async function GET(request: NextRequest) {
+  //in RL fetch data from a db,
+  await dbConnect(); // Ensure database connection is established
+  const user = await UserModel.find();
+
+  //if not found return 404
+  // else return data
+  if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+  return NextResponse.json(user, { status: 200 });
+}

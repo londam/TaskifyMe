@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import AudioPlayer from "./AudioPlayer"; // Assume you have this component
+import TranscribeButton from "./TranscribeButton";
 
 interface AudioFile {
   _id: string;
@@ -120,6 +121,11 @@ export default function AudioTable({ userId, refresh }: Props) {
                   >
                     Delete
                   </button>
+                  <TranscribeButton
+                    fileName={file.fileName}
+                    userId={userId}
+                    audioFileId={file._id}
+                  />
                 </td>
               </tr>
             );

@@ -63,6 +63,7 @@ export async function POST(request: Request) {
 
 // GET: Retrieve the list of files in the user’s folder
 export async function GET(request: Request) {
+  console.log("THIS IS RUN INSIDE OF GET INSIDE OF api/webdisk/GET");
   try {
     const userId = await getUserId(request); // Fetch the user's ID
     const url = new URL(request.url);

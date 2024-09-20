@@ -32,13 +32,8 @@ export default function AudioPlayer({ audioFileId }: Props) {
         return; // Exit if fetching from the database fails
       }
 
-      // const completeAudioUrl = `https://pandamedia.hr:2078/${audioUrl}`;
-      // const completeAudioUrl = `https://pandamedia.hr:2078/66ec6911587622135424d3a8/2024-09-19-20-33-12_file_example_MP3_700KB.mp3`;
-      //fileName = "2024-09-19-20-33-12_file_example_MP3_700KB.mp3";
-
       // Block 2: Fetch the actual audio file from your backend API (which interacts with WebDisk)
       try {
-        // const response = await fetch(`/api/webdisk?fileName=${audioFileName}`); // Use your API route for WebDisk
         const response = await fetch(`/api/webdisk?fileName=${fileName}`); // Use your API route for WebDisk
 
         if (!response.ok) {

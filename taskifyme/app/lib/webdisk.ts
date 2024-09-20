@@ -14,8 +14,10 @@ const getWebDiskClient = (): WebDAVClient => {
 
 // Function to get a list of files in a directory
 export const getFileList = async (folderPath: string): Promise<string[]> => {
+  const client = getWebDiskClient();
+
   try {
-    const response = await webDiskClient!.getDirectoryContents(folderPath); // Get directory contents
+    const response = await client.getDirectoryContents(folderPath); // Get directory contents
 
     // Check if the response has the expected type
     if (Array.isArray(response)) {
@@ -32,31 +34,19 @@ export const getFileList = async (folderPath: string): Promise<string[]> => {
 };
 
 // Function to get a single file's content
-export const getFile = async (filePath: string): Promise<Buffer> => {
+export const getFile = async (filePath: string) => {
+  const client = getWebDiskClient();
+
+  if (!client) {
+    throw new Error("Failed to initialize WebDisk client");
+  }
+
+  console.log("Fetching file from path:", filePath);
+
   try {
-    // Extract file extension
-    const fileExtension = filePath.split(".").pop()?.toLowerCase();
-
-    if (fileExtension !== "mp3" && fileExtension !== "m4a") {
-      throw new Error("Unsupported file type");
-    }
-
-    const response = await webDiskClient!.getFileContents(filePath); // Get file contents
-
-    if (typeof response === "string") {
-      // If response is a string (could be a URL or file content as text)
-      console.log("File type is text");
-      return Buffer.from(response, "utf-8"); // Convert string to Buffer with UTF-8 encoding
-    } else if (response instanceof Buffer) {
-      // If response is already a Buffer
-      return response;
-    } else if (response instanceof Uint8Array) {
-      // If response is an Uint8Array
-      return Buffer.from(response);
-    } else {
-      console.error("Unexpected response type from getFileContents:", response);
-      throw new Error("Failed to retrieve file content");
-    }
+    const fileContent = await client.getFileContents(filePath);
+    console.log("File content retrieved successfully.");
+    return fileContent;
   } catch (error) {
     console.error("Error retrieving file from Web Disk:", error);
     throw error;

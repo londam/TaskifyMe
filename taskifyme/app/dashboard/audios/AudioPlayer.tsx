@@ -6,74 +6,83 @@ interface Props {
 }
 //
 export default function AudioPlayer({ audioFileId }: Props) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [volume, setVolume] = useState(1); // Volume between 0 and 1 (default is 1)
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  const togglePlayPause = () => {
-    if (!audioRef.current) return;
-
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const updateProgress = () => {
-    if (!audioRef.current) return;
-
-    const currentTime = audioRef.current.currentTime;
-    const duration = audioRef.current.duration;
-    if (duration > 0) {
-      setProgress((currentTime / duration) * 100);
-    }
-  };
-
-  const changeVolume = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(event.target.value);
-    setVolume(newVolume);
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume;
-    }
-  };
+  const [audioUrl, setAudioUrl] = useState<string | null>(null); // Store the final audio URL (Blob URL)
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const audio = audioRef.current;
-    if (audio) {
-      audio.addEventListener("timeupdate", updateProgress);
-    }
-    return () => {
-      if (audio) {
-        audio.removeEventListener("timeupdate", updateProgress);
+    const fetchAudio = async () => {
+      let fileName;
+
+      // Block 1: Fetch the audio file name (or URL) from the database
+      try {
+        const response = await fetch(`/api/audios/${audioFileId}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to fetch audio metadata");
+        }
+
+        // Extract the audio URL or filename from the response
+        fileName = data.url; // assuming data.url contains the filename or URL
+      } catch (err) {
+        console.error("Error fetching audio metadata:", err);
+        setError("Failed to load audio metadata");
+        setLoading(false);
+        return; // Exit if fetching from the database fails
+      }
+
+      // const completeAudioUrl = `https://pandamedia.hr:2078/${audioUrl}`;
+      // const completeAudioUrl = `https://pandamedia.hr:2078/66ec6911587622135424d3a8/2024-09-19-20-33-12_file_example_MP3_700KB.mp3`;
+      //fileName = "2024-09-19-20-33-12_file_example_MP3_700KB.mp3";
+
+      // Block 2: Fetch the actual audio file from your backend API (which interacts with WebDisk)
+      try {
+        // const response = await fetch(`/api/webdisk?fileName=${audioFileName}`); // Use your API route for WebDisk
+        const response = await fetch(`/api/webdisk?fileName=${fileName}`); // Use your API route for WebDisk
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch audio file from WebDisk");
+        }
+
+        // Fetch the audio file as a Blob (binary data)
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob); // Create a URL for the Blob
+        setAudioUrl(blobUrl); // Set the Blob URL to be used in the audio player
+      } catch (err) {
+        console.error("Error fetching audio file from WebDisk:", err);
+        setError("Failed to load audio file from WebDisk");
+      } finally {
+        setLoading(false);
       }
     };
-  }, []);
 
+    fetchAudio();
+    return () => {
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl); // Clean up Blob URL when component unmounts
+      }
+    };
+  }, [audioFileId]);
+  //
+  useEffect(() => {
+    if (audioUrl) {
+      console.log("Audio URL generated:", audioUrl);
+    }
+  }, [audioUrl]);
+  //
   return (
     <div className="flex flex-col items-center p-4 bg-base-200 rounded-lg shadow-lg">
-      <audio ref={audioRef} src={src} preload="auto" className="hidden" />
-
-      <button onClick={togglePlayPause} className="btn btn-primary my-4">
-        {isPlaying ? "Pause" : "Play"}
-      </button>
-      {/* Progress Bar */}
-      <progress className="progress progress-primary w-full" value={progress} max="100"></progress>
-      {/* Volume Control */}
-      <div className="my-4 w-full flex items-center">
-        <label className="mr-2">Volume:</label>
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value={volume}
-          onChange={changeVolume}
-          className="range range-primary w-full"
-        />
-      </div>
+      {loading && <div>Loading audio...</div>}
+      {error && <div>Error: {error}</div>}
+      {!loading && !error && audioUrl ? (
+        <audio controls>
+          <source src={audioUrl} type="audio/mpeg" />
+          Your browser does not support the audio element.
+        </audio>
+      ) : (
+        <div>No audio file available</div>
+      )}
     </div>
   );
 }

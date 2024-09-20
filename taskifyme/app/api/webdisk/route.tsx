@@ -54,7 +54,7 @@ export async function POST(request: Request) {
 
     const fileUrl = `${folderPath}/${fileNameWithTimestamp}`; // Construct the file URL
 
-    return NextResponse.json({ fileUrl });
+    return NextResponse.json({ fileNameWithTimestamp });
   } catch (error) {
     console.error("Error uploading file:", error);
     return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });
@@ -73,7 +73,13 @@ export async function GET(request: Request) {
       const filePath = `${userId}/${fileName}`;
       const fileContent = await getFile(filePath); // Function to get the file content from WebDAV
 
-      return NextResponse.json({ file: fileContent });
+      return new Response(fileContent, {
+        headers: {
+          "Content-Type": "audio/mpeg", // Adjust this to match the MIME type of your audio file
+          "Content-Disposition": `inline; filename="${fileName}"`, // Optional, for filename suggestion
+        },
+      });
+      // return NextResponse.json({ file: fileContent });
     } else {
       // If no fileName is provided, return the list of files
       const folderPath = `${userId}`;

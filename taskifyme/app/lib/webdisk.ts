@@ -4,9 +4,9 @@ let webDiskClient: WebDAVClient | null = null;
 
 const getWebDiskClient = (): WebDAVClient => {
   if (!webDiskClient) {
-    webDiskClient = createClient(process.env.NEXT_PUBLIC_WEBDISK_HOST as string, {
-      username: process.env.NEXT_PUBLIC_WEBDISK_USERNAME as string,
-      password: process.env.NEXT_PUBLIC_WEBDISK_PASSWORD as string,
+    webDiskClient = createClient(process.env.WEBDISK_HOST as string, {
+      username: process.env.WEBDISK_USERNAME as string,
+      password: process.env.WEBDISK_PASSWORD as string,
     });
   }
   return webDiskClient;

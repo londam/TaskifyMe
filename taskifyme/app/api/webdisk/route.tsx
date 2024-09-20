@@ -52,9 +52,9 @@ export async function POST(request: Request) {
     // Upload file to WebDAV folder with the new timestamped file name
     await uploadFile(`${folderPath}/${fileNameWithTimestamp}`, buffer);
 
-    const fileUrl = `${folderPath}/${fileNameWithTimestamp}`; // Construct the file URL
+    const fileName = fileNameWithTimestamp; // Construct the file URL
 
-    return NextResponse.json({ fileNameWithTimestamp });
+    return NextResponse.json({ fileName });
   } catch (error) {
     console.error("Error uploading file:", error);
     return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });

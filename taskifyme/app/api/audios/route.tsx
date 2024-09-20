@@ -5,19 +5,19 @@ import { UserModel, AudioFileModel } from "@/app/lib/mongodb/models"; // Import 
 
 export async function POST(request: NextRequest) {
   try {
-    const { fileUrl, userId } = await request.json();
-    console.log("fileUrl", fileUrl);
+    const { fileName, userId } = await request.json();
+    console.log("fileName", fileName);
     console.log("userId", userId);
 
-    if (!fileUrl || !userId) {
-      return NextResponse.json({ error: "Missing fileUrl or userId" }, { status: 400 });
+    if (!fileName || !userId) {
+      return NextResponse.json({ error: "Missing fileName or userId" }, { status: 400 });
     }
 
     // Connect to the database
     const mongooseInstance = await dbConnect(); // Connect and get the Mongoose instance
 
     // Create an AudioFile entry
-    const audioFile = await AudioFileModel.create({ url: fileUrl });
+    const audioFile = await AudioFileModel.create({ url: fileName });
 
     // Find and update the User document
     const user = await UserModel.findById(userId);

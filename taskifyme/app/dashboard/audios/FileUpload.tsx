@@ -45,7 +45,7 @@ const FileUpload = () => {
         return;
       }
 
-      const fileUrl = uploadData.fileUrl;
+      const fileName = uploadData.fileName;
 
       // Step 2: Update database with file URL
       const updateResponse = await fetch("/api/audios", {
@@ -53,7 +53,7 @@ const FileUpload = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ fileUrl, userId: userId }), // !! replace with dynamic userId
+        body: JSON.stringify({ fileName, userId }), // !! replace with dynamic userId
       });
 
       const updateData = await updateResponse.json();

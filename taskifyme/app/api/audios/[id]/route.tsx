@@ -12,7 +12,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
   //if not found return 404
   // else return data
-  if (!audioFile) return NextResponse.json({ error: "User not found" }, { status: 404 });
+  if (!audioFile) return NextResponse.json({ error: "Audio not found" }, { status: 404 });
 
   return NextResponse.json(audioFile, { status: 200 });
 }

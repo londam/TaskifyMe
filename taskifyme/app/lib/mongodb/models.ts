@@ -10,6 +10,7 @@ interface User extends Document {
 
 interface AudioFile extends Document {
   url: string;
+  uploadedAt: Date;
   stt?: mongoose.Types.ObjectId;
 }
 
@@ -27,7 +28,8 @@ export const UserSchema: Schema = new Schema({
 });
 
 const AudioFileSchema: Schema = new Schema({
-  url: { type: String, required: true },
+  fileName: { type: String, required: true },
+  uploadedAt: { type: Date, default: Date.now },
   stt: { type: Schema.Types.ObjectId, ref: "STT", default: null },
 });
 

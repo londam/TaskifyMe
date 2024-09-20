@@ -24,7 +24,7 @@ export default function AudioPlayer({ audioFileId }: Props) {
         }
 
         // Extract the audio URL or filename from the response
-        fileName = data.url; // assuming data.url contains the filename or URL
+        fileName = data.fileName; // assuming data.url contains the filename or URL
       } catch (err) {
         console.error("Error fetching audio metadata:", err);
         setError("Failed to load audio metadata");

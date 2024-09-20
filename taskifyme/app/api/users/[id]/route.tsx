@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   //in RL fetch data from a db,
   await dbConnect(); // Ensure database connection is established
-  const user = await UserModel.findById(params.id).select("-password");
+  const user = await UserModel.findById(params.id).select("-password").populate("audioFiles");
 
   //if not found return 404
   // else return data

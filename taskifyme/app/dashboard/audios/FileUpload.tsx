@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const FileUpload = () => {
+const FileUpload = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
   const userId = process.env.NEXT_PUBLIC_USER_ID;
 
   const [file, setFile] = useState<File | null>(null);
@@ -25,11 +25,6 @@ const FileUpload = () => {
 
     const formData = new FormData();
     formData.append("file", file);
-
-    //this gives "file, [object File]" in console
-    // for (var key of formData.entries()) {
-    //   console.log(key[0] + ", " + key[1]);
-    // }
 
     try {
       // Step 1: Upload file to Web Disk
@@ -64,6 +59,8 @@ const FileUpload = () => {
 
       console.log("File successfully uploaded and saved to database:", updateData);
       setSuccess("File Successfully Added!");
+      // Call the onUploadSuccess callback to refresh AudioTable
+      onUploadSuccess();
     } catch (err) {
       setError("An error occurred during the upload");
     } finally {

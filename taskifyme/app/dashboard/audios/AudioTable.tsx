@@ -10,9 +10,10 @@ interface AudioFile {
 
 interface Props {
   userId: string;
+  refresh: boolean;
 }
 //
-export default function AudioTable({ userId }: Props) {
+export default function AudioTable({ userId, refresh }: Props) {
   //! dynamically change user !!
   const [audioFiles, setAudioFiles] = useState<AudioFile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +39,41 @@ export default function AudioTable({ userId }: Props) {
     };
 
     fetchAudioFiles();
-  }, []);
+  }, [refresh]);
+
+  const handleDelete = async (fileId: string, fileName: string) => {
+    const confirmed = window.confirm("Are you sure you want to delete this file?");
+    if (!confirmed) return;
+
+    try {
+      // Step 1: Delete from MongoDB
+      const deleteFromDBResponse = await fetch(`/api/audios/${fileId}`, {
+        method: "DELETE",
+      });
+
+      if (!deleteFromDBResponse.ok) {
+        throw new Error("Failed to delete file from MongoDB");
+      }
+
+      // Step 2: Delete from WebDisk
+      const deleteFromWebDiskResponse = await fetch(
+        `/api/webdisk?fileName=${encodeURIComponent(fileName)}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!deleteFromWebDiskResponse.ok) {
+        throw new Error("Failed to delete file from WebDisk");
+      }
+
+      // Update UI to reflect the deleted file
+      setAudioFiles((prevFiles) => prevFiles.filter((file) => file._id !== fileId));
+    } catch (error) {
+      console.error("Error deleting audio file:", error);
+      alert("Failed to delete audio file. Please try again.");
+    }
+  };
 
   // Function to parse the file name and extract the date and initial file name
   const parseFileName = (fileName: string) => {
@@ -78,7 +113,13 @@ export default function AudioTable({ userId }: Props) {
                   <AudioPlayer audioFileId={file._id} />
                 </td>
                 <td className="px-4 py-2">
-                  <button className="btn btn-primary">Submit</button>
+                  <button className="btn btn-primary mr-2">Submit</button>
+                  <button
+                    className="btn btn-error"
+                    onClick={() => handleDelete(file._id, file.fileName)}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             );

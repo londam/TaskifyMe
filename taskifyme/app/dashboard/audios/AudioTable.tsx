@@ -111,7 +111,6 @@ export default function AudioTable({ userId, refresh }: Props) {
                   <AudioPlayer audioFileId={file._id} />
                 </td>
                 <td className="px-4 py-2">
-                  <button className="btn btn-primary mr-2">Submit</button>
                   <button
                     className="btn btn-error"
                     onClick={() => handleDelete(file._id, file.fileName)}

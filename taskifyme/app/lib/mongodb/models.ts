@@ -13,7 +13,9 @@ export interface AudioFile extends Document {
   _id: string; // Explicitly declare the _id field
   fileName: string;
   uploadedAt: Date;
+  userId: string;
   stt?: mongoose.Types.ObjectId | STT;
+  requestId?: string;
 }
 
 export interface STT extends Document {
@@ -34,6 +36,8 @@ const AudioFileSchema: Schema = new Schema({
   fileName: { type: String, required: true },
   uploadedAt: { type: Date, default: Date.now },
   stt: { type: Schema.Types.ObjectId, ref: "STT", default: null },
+  requestId: { type: String, required: false },
+  userId: { type: String, required: true },
 });
 
 const STTSchema: Schema = new Schema({

@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const mongooseInstance = await dbConnect(); // Connect and get the Mongoose instance
 
     // Create an AudioFile entry
-    const audioFile = await AudioFileModel.create({ fileName: fileName });
+    const audioFile = await AudioFileModel.create({ fileName: fileName, userId: userId });
 
     // Find and update the User document
     const user = await UserModel.findById(userId);

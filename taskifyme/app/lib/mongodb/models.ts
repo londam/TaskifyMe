@@ -1,21 +1,24 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface User extends Document {
+export interface User extends Document {
+  _id: string; // Explicitly declare the _id field
   name: string;
   email?: string;
   password?: string;
-  audioFiles?: mongoose.Types.ObjectId[];
-  stts?: mongoose.Types.ObjectId[];
+  audioFiles?: mongoose.Types.ObjectId[] | AudioFile[];
+  stts?: mongoose.Types.ObjectId[] | STT[];
 }
 
-interface AudioFile extends Document {
-  url: string;
+export interface AudioFile extends Document {
+  _id: string; // Explicitly declare the _id field
+  fileName: string;
   uploadedAt: Date;
-  stt?: mongoose.Types.ObjectId;
+  stt?: mongoose.Types.ObjectId | STT;
 }
 
-interface STT extends Document {
-  audio: mongoose.Types.ObjectId;
+export interface STT extends Document {
+  _id: string; // Explicitly declare the _id field
+  audio: mongoose.Types.ObjectId | AudioFile;
   content: string;
 }
 

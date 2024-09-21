@@ -2,12 +2,9 @@
 import { useState, useEffect } from "react";
 import AudioPlayer from "./AudioPlayer"; // Assume you have this component
 import TranscribeButton from "./TranscribeButton";
-
-interface AudioFile {
-  _id: string;
-  fileName: string;
-  uploadedAt: string;
-}
+import { AudioFile } from "@/app/lib/mongodb/models";
+import mongoose from "mongoose";
+import STTButton from "./STTButton";
 
 interface Props {
   userId: string;
@@ -69,7 +66,7 @@ export default function AudioTable({ userId, refresh }: Props) {
       }
 
       // Update UI to reflect the deleted file
-      setAudioFiles((prevFiles) => prevFiles.filter((file) => file._id !== fileId));
+      setAudioFiles((prevFiles) => prevFiles.filter((file) => file._id.toString() !== fileId));
     } catch (error) {
       console.error("Error deleting audio file:", error);
       alert("Failed to delete audio file. Please try again.");
@@ -121,11 +118,15 @@ export default function AudioTable({ userId, refresh }: Props) {
                   >
                     Delete
                   </button>
-                  <TranscribeButton
-                    fileName={file.fileName}
-                    userId={userId}
-                    audioFileId={file._id}
-                  />
+                  {file.stt ? (
+                    <STTButton sttId={file.stt.toString()} userId={userId}></STTButton>
+                  ) : (
+                    <TranscribeButton
+                      fileName={file.fileName}
+                      userId={userId}
+                      audioFileId={file._id}
+                    />
+                  )}
                 </td>
               </tr>
             );

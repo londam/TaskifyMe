@@ -15,10 +15,16 @@ export interface AudioFile extends Document {
   uploadedAt: Date;
   userId: string;
   stt?: mongoose.Types.ObjectId | STT;
+  processedText?: mongoose.Types.ObjectId | ProcessedText;
   requestId?: string;
 }
 
 export interface STT extends Document {
+  _id: string; // Explicitly declare the _id field
+  audio: mongoose.Types.ObjectId | AudioFile;
+  content: string;
+}
+export interface ProcessedText extends Document {
   _id: string; // Explicitly declare the _id field
   audio: mongoose.Types.ObjectId | AudioFile;
   content: string;
@@ -45,10 +51,18 @@ const STTSchema: Schema = new Schema({
   content: { type: String, required: true },
 });
 
+const ProcessedTextSchema: Schema = new Schema({
+  audio: { type: Schema.Types.ObjectId, ref: "AudioFile", required: true },
+  content: { type: String, required: true },
+});
+
 // Export models
 const AudioFileModel =
   mongoose.models.AudioFile || mongoose.model<AudioFile>("AudioFile", AudioFileSchema);
 const STTModel = mongoose.models.STT || mongoose.model<STT>("STT", STTSchema);
 const UserModel = mongoose.models.User || mongoose.model<User>("User", UserSchema);
+const ProcessedText =
+  mongoose.models.ProcessedText ||
+  mongoose.model<ProcessedText>("ProcessedText", ProcessedTextSchema);
 
-export { AudioFileModel, STTModel, UserModel };
+export { AudioFileModel, STTModel, UserModel, ProcessedText };

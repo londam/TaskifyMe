@@ -1,9 +1,10 @@
 "use client";
 import { AudioFile } from "@/app/lib/mongodb/models";
 import { Button } from "primereact/button";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Dialog } from "primereact/dialog";
-import STTButton from "./STTButton";
+import ProcessTextButton from "./ProcessTextButton";
+import { InputTextarea } from "primereact/inputtextarea";
 //
 interface Props {
   audioFile: AudioFile;
@@ -11,8 +12,45 @@ interface Props {
 //
 export default function TranscribeButton({ audioFile }: Props) {
   const { fileName, userId, _id: audioFileId } = audioFile;
+  const [sttContent, setSttContent] = useState<string>("");
+  const [visible, setVisible] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   //
   const [isTranscribing, setIsTranscribing] = useState(false); // Track transcription state
+
+  const handleShowingTranscription = async () => {
+    console.log("sttContent", sttContent);
+    // Check if the STT content is already fetched
+    if (sttContent !== "") {
+      // Already fetched, just show the dialog
+      setVisible(true);
+    } else if (audioFile.stt) {
+      // Not fetched yet, fetch it and then show the dialog
+      await fetchSTT(audioFile.stt.toString());
+      setVisible(true);
+    }
+  };
+
+  const fetchSTT = async (sttId: string) => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(`/api/stts/${sttId}`); // Fetch from DB
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch STT");
+      }
+
+      setSttContent(data.content); // Assuming the API returns an STT with a content field
+    } catch (err) {
+      setError("Error fetching STT");
+      console.error("Error fetching STT:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleTranscribe = async () => {
     setIsTranscribing(true);
@@ -48,13 +86,7 @@ export default function TranscribeButton({ audioFile }: Props) {
     if ((!isTranscribing || audioFile.requestId) && !audioFile.stt)
       return (
         <>
-          <Button
-            rounded
-            severity="success"
-            className="mr-2"
-            tooltip="Get text from audio"
-            onClick={handleTranscribe}
-          >
+          <Button rounded severity="success" className="mr-2" onClick={handleTranscribe}>
             <i className="pi pi-microphone mr-1" />
             <i className="pi pi-arrow-right mr-1" />
             <i className="pi pi-align-justify" />
@@ -69,7 +101,6 @@ export default function TranscribeButton({ audioFile }: Props) {
             rounded
             severity="success"
             className="mr-2"
-            tooltip="Transcribing"
             // onClick={handleTranscribe}
           >
             <i className="pi pi-cog pi-spin" />
@@ -85,13 +116,32 @@ export default function TranscribeButton({ audioFile }: Props) {
             icon="pi pi-eye"
             severity="success"
             className="mr-2"
-            tooltip="Preview & Edit"
-            //onClick={() => setVisible(true)}
+            onClick={handleShowingTranscription}
           ></Button>
-          <STTButton sttId={audioFile.stt.toString()} userId={userId}></STTButton>
         </>
       );
   };
 
-  return <div>{transcribeButtonsBody()}</div>;
+  return (
+    <div>
+      {transcribeButtonsBody()}
+
+      <Dialog
+        header="Header"
+        visible={visible}
+        maximizable
+        style={{ width: "50vw" }}
+        onHide={() => setVisible(false)}
+        focusOnShow={false} // Prevents dialog from auto-focusing elements inside
+        blockScroll={true} // Prevent the dialog from managing focus incorrectly
+      >
+        <InputTextarea
+          value={sttContent}
+          onChange={(e) => setSttContent(e.target.value)}
+          rows={10}
+          className="w-full"
+        />
+      </Dialog>
+    </div>
+  );
 }

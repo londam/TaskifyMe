@@ -17,8 +17,8 @@ import { Demo } from "@/types";
 //
 import { AudioFile } from "@/app/lib/mongodb/models";
 import AudioPlayer from "./AudioPlayer";
-import { Tooltip } from "primereact/tooltip";
 import TranscribeButton from "./TranscribeButton";
+import ProcessTextButton from "./ProcessTextButton";
 
 interface Props {
   userId: string;
@@ -150,20 +150,30 @@ const AudioTablePR = ({ userId }: Props) => {
     );
   };
 
-  const actionBodyTemplate = (rowData: AudioFile) => {
+  const actionDeleteBodyTemplate = (rowData: AudioFile) => {
     return (
-      <div className="flex">
-        <Button
-          className="mr-2"
-          icon="pi pi-trash"
-          rounded
-          severity="warning"
-          onClick={() => confirmDeleteProduct(rowData)}
-          tooltip="Delete audio file"
-        />
-        <TranscribeButton audioFile={rowData} />
-      </div>
+      <Button
+        className="mr-2"
+        icon="pi pi-trash"
+        rounded
+        severity="warning"
+        onClick={() => confirmDeleteProduct(rowData)}
+      />
     );
+  };
+
+  const actionTranscribeBodyTemplate = (rowData: AudioFile) => {
+    return <TranscribeButton audioFile={rowData} />;
+  };
+
+  const actionProcessBodyTemplate = (rowData: AudioFile) => {
+    return (
+      <>{rowData.stt && <ProcessTextButton sttId={rowData.stt?.toString()} userId={userId} />}</>
+    );
+  };
+
+  const actionSummarizeBodyTemplate = (rowData: AudioFile) => {
+    // return <TranscribeButton audioFile={rowData} />;
   };
 
   const header = (
@@ -182,7 +192,7 @@ const AudioTablePR = ({ userId }: Props) => {
             ref={dt}
             value={audioFiles}
             selectionMode="single"
-            dataKey="id"
+            dataKey="_id"
             paginator
             rows={10}
             rowsPerPageOptions={[5, 10, 25]}
@@ -208,7 +218,26 @@ const AudioTablePR = ({ userId }: Props) => {
               headerStyle={{ minWidth: "7rem" }}
             ></Column>
             <Column body={playerBodyTemplate} headerStyle={{ minWidth: "8rem" }}></Column>
-            <Column body={actionBodyTemplate} headerStyle={{ minWidth: "10rem" }}></Column>
+            <Column
+              header="Delete"
+              body={actionDeleteBodyTemplate}
+              className="text-center"
+            ></Column>
+            <Column
+              header="Transcribe"
+              body={actionTranscribeBodyTemplate}
+              className="text-center"
+            ></Column>
+            <Column
+              header="Process"
+              body={actionProcessBodyTemplate}
+              className="text-center"
+            ></Column>
+            <Column
+              header="Summarize"
+              body={actionSummarizeBodyTemplate}
+              className="text-center"
+            ></Column>
           </DataTable>
 
           <Dialog

@@ -1,3 +1,4 @@
+import { Button } from "primereact/button";
 import React, { useState } from "react";
 //
 interface Props {
@@ -5,7 +6,7 @@ interface Props {
   userId: string;
 }
 //
-export default function STTButton({ sttId, userId }: Props) {
+export default function ProcessTextButton({ sttId, userId }: Props) {
   const [sttContent, setSttContent] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,9 +42,9 @@ export default function STTButton({ sttId, userId }: Props) {
   return (
     <>
       <>
-        <button className="btn btn-secondary" onClick={handleShowTranscription}>
+        <Button className="btn btn-secondary" onClick={handleShowTranscription}>
           {sttContent && showContent ? "Hide transcription" : "Show transcription"}
-        </button>
+        </Button>
 
         {loading && <p>Loading transcription...</p>}
         {error && <p>{error}</p>}
@@ -54,7 +55,7 @@ export default function STTButton({ sttId, userId }: Props) {
           </div>
         )}
 
-        <button className="btn btn-secondary btn-outline">Process transcription via chatGPT</button>
+        <Button className="btn btn-secondary btn-outline">Process transcription via chatGPT</Button>
       </>
     </>
   );

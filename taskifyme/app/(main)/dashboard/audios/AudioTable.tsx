@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import AudioPlayer from "./AudioPlayer"; // Assume you have this component
 import TranscribeButton from "./TranscribeButton";
 import { AudioFile } from "@/app/lib/mongodb/models";
-import STTButton from "./STTButton";
+import ProcessTextButton from "./ProcessTextButton";
 
 interface Props {
   userId: string;
@@ -117,7 +117,10 @@ export default function AudioTable({ userId, refresh }: Props) {
                     Delete
                   </button>
                   {file.stt ? (
-                    <STTButton sttId={file.stt.toString()} userId={userId}></STTButton>
+                    <ProcessTextButton
+                      sttId={file.stt.toString()}
+                      userId={userId}
+                    ></ProcessTextButton>
                   ) : (
                     <TranscribeButton
                       fileName={file.fileName}

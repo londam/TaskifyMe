@@ -15,9 +15,9 @@ export default function TranscribeButton({ audioFile }: Props) {
   const [sttContent, setSttContent] = useState<string>("");
   const [visible, setVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
   //
   const [isTranscribing, setIsTranscribing] = useState(false); // Track transcription state
+  const POLLING_INTERVAL = 2500; // Poll every 5 seconds
 
   const handleShowingTranscription = async () => {
     console.log("sttContent", sttContent);
@@ -34,8 +34,6 @@ export default function TranscribeButton({ audioFile }: Props) {
 
   const fetchSTT = async (sttId: string) => {
     try {
-      setLoading(true);
-
       const response = await fetch(`/api/stts/${sttId}`); // Fetch from DB
       const data = await response.json();
 
@@ -47,8 +45,6 @@ export default function TranscribeButton({ audioFile }: Props) {
     } catch (err) {
       setError("Error fetching STT");
       console.error("Error fetching STT:", err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -74,11 +70,45 @@ export default function TranscribeButton({ audioFile }: Props) {
       if (!response.ok) {
         throw new Error(data.message || "Failed to start transcription");
       }
+
+      // Start polling for transcription status
+      startPollingTranscriptionStatus();
     } catch (error: any) {
       console.error("Error starting transcription:", error);
     } finally {
-      setIsTranscribing(false);
     }
+  };
+
+  // Function to start polling transcription status
+  const startPollingTranscriptionStatus = () => {
+    const polling = setInterval(async () => {
+      try {
+        // Poll the backend for transcription status
+        const response = await fetch(`/api/audios/transcriptionStatus`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            audioFileId,
+          }),
+        });
+        const data = await response.json();
+        console.log("____________________POOLING_______________________________________");
+        console.log("data", data);
+
+        if (data.status === "completed") {
+          // Stop polling when transcription is completed
+          clearInterval(polling);
+          audioFile.stt = data.sttId; // Update the transcription content in state
+          setIsTranscribing(false); // Update state to show transcription is done
+          console.log("Transcription completed:", data.transcript);
+        }
+      } catch (error) {
+        console.error("Error polling transcription status:", error);
+      } finally {
+      }
+    }, POLLING_INTERVAL);
   };
 
   const transcribeButtonsBody = () => {

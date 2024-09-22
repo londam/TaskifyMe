@@ -13,7 +13,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
   //if not found return 404
   // else return data
-  if (!stt) return NextResponse.json({ error: "Audio not found" }, { status: 404 });
+  if (!stt) return NextResponse.json({ error: "STT not found" }, { status: 404 });
 
   return NextResponse.json(stt, { status: 200 });
 }

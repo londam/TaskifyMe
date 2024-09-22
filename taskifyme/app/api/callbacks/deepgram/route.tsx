@@ -11,10 +11,6 @@ export async function POST(request: NextRequest) {
 
     // Extract the transcript from the results
     const transcript = results.channels[0].alternatives[0].transcript;
-    console.log("_________________________________________________________________________");
-    console.log("body", body);
-    console.log("req_id", request_id);
-    console.log("transcript", transcript);
 
     if (!request_id || !transcript) {
       return NextResponse.json({ message: "Invalid webhook payload" }, { status: 400 });

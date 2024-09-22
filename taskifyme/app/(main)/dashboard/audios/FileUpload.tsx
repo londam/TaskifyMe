@@ -75,9 +75,13 @@ const FileUpload = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
           type="file"
           accept="audio/*"
           onChange={handleFileChange}
-          className="file-input file-input-bordered file-input-primary w-full max-w-xs mr-3"
+          className="p-button p-component p-fileupload-choose p-fileupload-choose-selected"
         />
-        <button onClick={handleUpload} className="btn btn-primary" disabled={uploading || !file}>
+        <button
+          onClick={handleUpload}
+          className="p-button p-component p-focus"
+          disabled={uploading || !file}
+        >
           {uploading ? "Uploading..." : "Upload"}
         </button>
       </div>

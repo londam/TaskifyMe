@@ -18,8 +18,8 @@ const AudiosPage = () => {
     <>
       <div>AudiosPage</div>
       <FileUpload onUploadSuccess={handleRefresh} />
+      <AudioTable userId={userId!} refresh={refreshAudioTable} />
       <div className="mt-5 bg-base-100 flex items-center justify-center">
-        <AudioTable userId={userId!} refresh={refreshAudioTable} />
         <AudioTablePR userId={userId!} refresh={refreshAudioTable} />
       </div>
     </>

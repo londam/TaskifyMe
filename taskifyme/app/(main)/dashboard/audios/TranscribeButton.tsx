@@ -1,51 +1,20 @@
 "use client";
+import { AudioFile } from "@/app/lib/mongodb/models";
+import { Button } from "primereact/button";
 import React, { useState } from "react";
+import { Dialog } from "primereact/dialog";
+import STTButton from "./STTButton";
 //
 interface Props {
-  fileName: string;
-  userId: string;
-  audioFileId: string;
+  audioFile: AudioFile;
 }
 //
-export default function TranscribeButton({ fileName, userId, audioFileId }: Props) {
+export default function TranscribeButton({ audioFile }: Props) {
+  const { fileName, userId, _id: audioFileId } = audioFile;
   //
-  const [transcript, setTranscript] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
   const [isTranscribing, setIsTranscribing] = useState(false); // Track transcription state
   const [message, setMessage] = useState<string | null>(null); // Store success/error messages
-
-  const handleTranscribeSTTRouter = async () => {
-    setLoading(true);
-    setError(null);
-    setTranscript(null);
-
-    try {
-      // Send the file path to your API to initiate the transcription process
-      const response = await fetch(`/api/stts`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fileName: fileName,
-          userId: userId,
-          audioFileId: audioFileId,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to process the file.");
-      }
-
-      const data = await response.json();
-      setTranscript(data.transcript);
-    } catch (error) {
-      setError("Error occurred during transcription.");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [visible, setVisible] = useState<boolean>(false);
 
   const handleTranscribe = async () => {
     setIsTranscribing(true);
@@ -80,6 +49,56 @@ export default function TranscribeButton({ fileName, userId, audioFileId }: Prop
     }
   };
 
+  const transcribeButtonsBody = () => {
+    //stt doesn't exist and it's not transcribing starting situation
+    if ((!isTranscribing || audioFile.requestId) && !audioFile.stt)
+      return (
+        <>
+          <Button
+            rounded
+            severity="success"
+            className="mr-2"
+            tooltip="Get text from audio"
+            onClick={handleTranscribe}
+          >
+            <i className="pi pi-microphone mr-1" />
+            <i className="pi pi-arrow-right mr-1" />
+            <i className="pi pi-align-justify" />
+          </Button>
+        </>
+      );
+    // we just put it to transcribe, but need to handle refreshing
+    if (isTranscribing || audioFile.requestId)
+      return (
+        <>
+          <Button
+            rounded
+            severity="success"
+            className="mr-2"
+            tooltip="Transcribing"
+            // onClick={handleTranscribe}
+          >
+            <i className="pi pi-cog pi-spin" />
+          </Button>
+        </>
+      );
+    //it's transcribed and available
+    if (audioFile.stt)
+      return (
+        <>
+          <Button
+            rounded
+            icon="pi pi-eye"
+            severity="success"
+            className="mr-2"
+            tooltip="Preview & Edit"
+            onClick={() => setVisible(true)}
+          ></Button>
+          <STTButton sttId={audioFile.stt.toString()} userId={userId}></STTButton>
+        </>
+      );
+  };
+
   return (
     <div>
       {/* <button //STT_Route!!!
@@ -89,11 +108,7 @@ export default function TranscribeButton({ fileName, userId, audioFileId }: Prop
       >
         {loading ? "Transcribing..." : "Transcribe"}
       </button> */}
-      <button className="btn btn-primary" onClick={handleTranscribe} disabled={isTranscribing}>
-        {isTranscribing ? "Transcribing..." : "Transcribe"}
-      </button>
-      {error && <p className="text-red-500">{error}</p>}
-      {message && <p>{message}</p>} {/* Display success or error messages */}
+      {transcribeButtonsBody()}
     </div>
   );
 }

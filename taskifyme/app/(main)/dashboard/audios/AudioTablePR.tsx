@@ -17,23 +17,14 @@ import { Demo } from "@/types";
 //
 import { AudioFile } from "@/app/lib/mongodb/models";
 import AudioPlayer from "./AudioPlayer";
+import { Tooltip } from "primereact/tooltip";
+import TranscribeButton from "./TranscribeButton";
 
 interface Props {
   userId: string;
 }
 
 const AudioTablePR = ({ userId }: Props) => {
-  let emptyProduct: Demo.Product = {
-    id: "",
-    name: "",
-    image: "",
-    description: "",
-    category: "",
-    price: 0,
-    quantity: 0,
-    rating: 0,
-    inventoryStatus: "INSTOCK",
-  };
   const [refreshAudioTable, setRefreshAudioTable] = useState(false);
 
   const [deleteAudioDialog, setDeleteAudioDialog] = useState(false);
@@ -133,21 +124,17 @@ const AudioTablePR = ({ userId }: Props) => {
 
   const actionBodyTemplate = (rowData: AudioFile) => {
     return (
-      <>
+      <div className="flex">
         <Button
-          icon="pi pi-pencil"
-          rounded
-          severity="success"
           className="mr-2"
-          // onClick={() => editProduct(rowData)}
-        />
-        <Button
           icon="pi pi-trash"
           rounded
           severity="warning"
           onClick={() => confirmDeleteProduct(rowData)}
+          tooltip="Delete audio file"
         />
-      </>
+        <TranscribeButton audioFile={rowData} />
+      </div>
     );
   };
 
@@ -248,7 +235,7 @@ const AudioTablePR = ({ userId }: Props) => {
               <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: "2rem" }} />
               {audioToDelete && (
                 <span>
-                  Are you sure you want to delete <b>{audioToDelete.name}</b>?
+                  Are you sure you want to delete <b>{audioToDelete.fileName}</b>?
                 </span>
               )}
             </div>

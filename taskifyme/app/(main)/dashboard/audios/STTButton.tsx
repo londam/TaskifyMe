@@ -54,7 +54,7 @@ export default function STTButton({ sttId, userId }: Props) {
           </div>
         )}
 
-        <button className="btn btn-secondary btn-outline">Process transcription</button>
+        <button className="btn btn-secondary btn-outline">Process transcription via chatGPT</button>
       </>
     </>
   );

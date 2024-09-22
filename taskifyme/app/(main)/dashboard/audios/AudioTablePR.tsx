@@ -96,48 +96,6 @@ const AudioTablePR = ({ userId }: Props) => {
     });
   };
 
-  const fileNameBodyTemplate = (rowData: AudioFile) => {
-    return (
-      <>
-        <span className="p-column-title">Code</span>
-        {parseFileName(rowData.fileName)}
-      </>
-    );
-  };
-
-  const dateBodyTemplate = (rowData: AudioFile) => {
-    return (
-      <>
-        <span className="p-column-title">Name</span>
-        {new Date(rowData.uploadedAt).toLocaleDateString()}
-      </>
-    );
-  };
-
-  const playerBodyTemplate = (rowData: AudioFile) => {
-    return (
-      <>
-        <AudioPlayer audioFileId={rowData._id} />
-      </>
-    );
-  };
-
-  const actionBodyTemplate = (rowData: AudioFile) => {
-    return (
-      <div className="flex">
-        <Button
-          className="mr-2"
-          icon="pi pi-trash"
-          rounded
-          severity="warning"
-          onClick={() => confirmDeleteProduct(rowData)}
-          tooltip="Delete audio file"
-        />
-        <TranscribeButton audioFile={rowData} />
-      </div>
-    );
-  };
-
   const handleDelete = async (fileId: string, fileName: string) => {
     try {
       // Step 1: Delete from MongoDB
@@ -169,19 +127,50 @@ const AudioTablePR = ({ userId }: Props) => {
     }
   };
 
-  const header = (
-    <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-      <h5 className="m-0">Manage Audios</h5>
-
-      <FileUploadPR onUploadSuccess={handleRefresh} />
-    </div>
-  );
-
   const deleteProductDialogFooter = (
     <>
       <Button label="No" icon="pi pi-times" text onClick={hideDeleteProductDialog} />
       <Button label="Yes" icon="pi pi-check" text onClick={deleteProduct} />
     </>
+  );
+
+  const fileNameBodyTemplate = (rowData: AudioFile) => {
+    return <p>{parseFileName(rowData.fileName)}</p>;
+  };
+
+  const dateBodyTemplate = (rowData: AudioFile) => {
+    return <p>{new Date(rowData.uploadedAt).toLocaleDateString()}</p>;
+  };
+
+  const playerBodyTemplate = (rowData: AudioFile) => {
+    return (
+      <>
+        <AudioPlayer audioFileId={rowData._id} />
+      </>
+    );
+  };
+
+  const actionBodyTemplate = (rowData: AudioFile) => {
+    return (
+      <div className="flex">
+        <Button
+          className="mr-2"
+          icon="pi pi-trash"
+          rounded
+          severity="warning"
+          onClick={() => confirmDeleteProduct(rowData)}
+          tooltip="Delete audio file"
+        />
+        <TranscribeButton audioFile={rowData} />
+      </div>
+    );
+  };
+
+  const header = (
+    <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+      <h5 className="m-0">Manage Audios</h5>
+      <FileUploadPR onUploadSuccess={handleRefresh} />
+    </div>
   );
 
   return (
@@ -193,7 +182,6 @@ const AudioTablePR = ({ userId }: Props) => {
             ref={dt}
             value={audioFiles}
             selectionMode="single"
-            // selection={selectedAudio}
             dataKey="id"
             paginator
             rows={10}
@@ -217,9 +205,9 @@ const AudioTablePR = ({ userId }: Props) => {
               header="Date"
               sortable
               body={dateBodyTemplate}
-              headerStyle={{ minWidth: "15rem" }}
+              headerStyle={{ minWidth: "7rem" }}
             ></Column>
-            <Column body={playerBodyTemplate} headerStyle={{ minWidth: "10rem" }}></Column>
+            <Column body={playerBodyTemplate} headerStyle={{ minWidth: "8rem" }}></Column>
             <Column body={actionBodyTemplate} headerStyle={{ minWidth: "10rem" }}></Column>
           </DataTable>
 

@@ -13,12 +13,9 @@ export default function TranscribeButton({ audioFile }: Props) {
   const { fileName, userId, _id: audioFileId } = audioFile;
   //
   const [isTranscribing, setIsTranscribing] = useState(false); // Track transcription state
-  const [message, setMessage] = useState<string | null>(null); // Store success/error messages
-  const [visible, setVisible] = useState<boolean>(false);
 
   const handleTranscribe = async () => {
     setIsTranscribing(true);
-    setMessage(null);
 
     try {
       // Call the /api/transcribe endpoint
@@ -39,11 +36,8 @@ export default function TranscribeButton({ audioFile }: Props) {
       if (!response.ok) {
         throw new Error(data.message || "Failed to start transcription");
       }
-
-      setMessage("Transcription started successfully!");
     } catch (error: any) {
       console.error("Error starting transcription:", error);
-      setMessage(error.message || "Error during transcription");
     } finally {
       setIsTranscribing(false);
     }
@@ -92,23 +86,12 @@ export default function TranscribeButton({ audioFile }: Props) {
             severity="success"
             className="mr-2"
             tooltip="Preview & Edit"
-            onClick={() => setVisible(true)}
+            //onClick={() => setVisible(true)}
           ></Button>
           <STTButton sttId={audioFile.stt.toString()} userId={userId}></STTButton>
         </>
       );
   };
 
-  return (
-    <div>
-      {/* <button //STT_Route!!!
-        onClick={handleTranscribe}
-        disabled={loading}
-        className="btn btn-outline btn-secondary"
-      >
-        {loading ? "Transcribing..." : "Transcribe"}
-      </button> */}
-      {transcribeButtonsBody()}
-    </div>
-  );
+  return <div>{transcribeButtonsBody()}</div>;
 }

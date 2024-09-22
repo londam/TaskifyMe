@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 //
 interface Props {
   audioFileId: string;
@@ -60,24 +60,23 @@ export default function AudioPlayer({ audioFileId }: Props) {
     };
   }, [audioFileId]);
   //
-  useEffect(() => {
-    if (audioUrl) {
-      console.log("Audio URL generated:", audioUrl);
-    }
-  }, [audioUrl]);
-  //
-  return (
-    <div className="flex flex-col items-center p-4 bg-base-200 rounded-lg shadow-lg">
-      {loading && <div>Loading audio...</div>}
-      {error && <div>Error: {error}</div>}
-      {!loading && !error && audioUrl ? (
+
+  const audioPlayerBody = () => {
+    if (loading) return <i className="pi pi-cog pi-spin" />;
+    if (error) return <div>Error: {error}</div>;
+    if (!loading && !error && audioUrl)
+      return (
         <audio controls>
           <source src={audioUrl} type="audio/mpeg" />
           Your browser does not support the audio element.
         </audio>
-      ) : (
-        <div>No audio file available</div>
-      )}
+      );
+    else return <div>No audio file available</div>;
+  };
+
+  return (
+    <div className="flex flex-col items-center p-1 bg-base-200 rounded-lg shadow-lg">
+      {audioPlayerBody()}
     </div>
   );
 }

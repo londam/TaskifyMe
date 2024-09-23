@@ -28,7 +28,7 @@ export async function POST(request: Request) {
         { role: "user", content: prompt },
       ],
       temperature: 0.7,
-      max_tokens: 3000,
+      max_tokens: 10000,
       n: 1,
       stop: null,
     });

@@ -18,6 +18,7 @@ import { getFirstTagContent } from "@/app/utils/getFirstTagContent";
 import { Sidebar } from "primereact/sidebar";
 import { Editor } from "primereact/editor";
 import { InputText } from "primereact/inputtext";
+import { Calendar } from "primereact/calendar";
 
 interface Props {
   userId: string;
@@ -220,12 +221,38 @@ const ProcessedTextTable = ({ userId }: Props) => {
     setTaskRows(updatedTasks);
   };
 
-  const taskEditorTemplate = (rowData: any, field: string, rowIndex: number) => {
+  const taskEditorTitleTemplate = (rowData: any, field: string, rowIndex: number) => {
     return (
       <InputText
         value={rowData[field]}
         onChange={(e) => onTaskEditorValueChange(e, rowIndex, field)}
       />
+    );
+  };
+
+  const taskEditorDescrTemplate = (rowData: any, field: string, rowIndex: number) => {
+    return (
+      <InputText
+        value={rowData[field]}
+        onChange={(e) => onTaskEditorValueChange(e, rowIndex, field)}
+      />
+    );
+  };
+
+  const taskEditorCalendarTemplate = (rowData: any, field: string, rowIndex: number) => {
+    // Safely convert the ISO string to a Date object if it exists, otherwise null
+    const value = rowData[field] ? new Date(rowData[field]) : null;
+
+    return (
+      <div>
+        <Calendar
+          value={value} // Calendar expects a Date object
+          onChange={(e) => onTaskEditorValueChange(e, rowIndex, field)}
+          dateFormat="dd/mm/yy"
+          showTime
+          hourFormat="24"
+        />
+      </div>
     );
   };
 
@@ -306,7 +333,7 @@ const ProcessedTextTable = ({ userId }: Props) => {
               <Editor
                 value={summaryContent}
                 onTextChange={(e) => setSummaryContent(e.htmlValue || "")}
-                style={{ height: "200px" }}
+                style={{ height: "300px" }}
               />
 
               <h2>Tasks</h2>
@@ -314,20 +341,22 @@ const ProcessedTextTable = ({ userId }: Props) => {
                 <Column
                   field="taskName"
                   header="Task Name"
-                  body={(rowData, { rowIndex }) => taskEditorTemplate(rowData, "title", rowIndex)}
+                  body={(rowData, { rowIndex }) =>
+                    taskEditorTitleTemplate(rowData, "title", rowIndex)
+                  }
                 ></Column>
                 <Column
                   field="taskDescription"
                   header="Task Description"
                   body={(rowData, { rowIndex }) =>
-                    taskEditorTemplate(rowData, "description", rowIndex)
+                    taskEditorDescrTemplate(rowData, "description", rowIndex)
                   }
                 ></Column>
                 <Column
                   field="dueDate"
                   header="Due Date"
                   body={(rowData, { rowIndex }) =>
-                    taskEditorTemplate(rowData, "date_time", rowIndex)
+                    taskEditorCalendarTemplate(rowData, "date_time", rowIndex)
                   }
                 ></Column>
                 <Column

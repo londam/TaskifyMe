@@ -90,9 +90,9 @@ const ProcessedTextTable = ({ userId }: Props) => {
   const fileNameBodyTemplate = (rowData: ProcessedText) => {
     const content = JSON.parse(rowData.content);
     const title = getFirstTagContent(content.summary) + " ";
-    if (title.length <= 1) return <h3>"..."</h3>;
-    if (title.length < 40) return <h3>{title}</h3>;
-    return <h3>{title.slice(0, 37) + "..."}</h3>;
+    if (title.length <= 1) return <p className="text-lg">"..."</p>;
+    if (title.length < 40) return <p className="text-lg">{title}</p>;
+    return <p className="text-lg">{title.slice(0, 37) + "..."}</p>;
   };
 
   const dateBodyTemplate = (rowData: ProcessedText) => {
@@ -147,6 +147,7 @@ const ProcessedTextTable = ({ userId }: Props) => {
               header="Summary"
               sortable
               body={fileNameBodyTemplate}
+              className="align-middle"
               headerStyle={{ minWidth: "15rem" }}
             ></Column>
             <Column

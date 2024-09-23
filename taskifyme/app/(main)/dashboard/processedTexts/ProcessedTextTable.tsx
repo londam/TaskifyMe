@@ -10,6 +10,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { ProcessedText } from "@/app/lib/mongodb/models";
 import { fetchUserProcessedTexts } from "@/app/services/userService";
 import { deleteProcessedText } from "@/app/services/processedTextService";
+import { getFirstTagContent } from "@/app/utils/getFirstTagContent";
 
 interface Props {
   userId: string;
@@ -87,7 +88,11 @@ const ProcessedTextTable = ({ userId }: Props) => {
   );
 
   const fileNameBodyTemplate = (rowData: ProcessedText) => {
-    return <p>{rowData.content.slice(0, 20)}</p>;
+    const content = JSON.parse(rowData.content);
+    const title = getFirstTagContent(content.summary) + " ";
+    if (title.length <= 1) return <h3>"..."</h3>;
+    if (title.length < 40) return <h3>{title}</h3>;
+    return <h3>{title.slice(0, 37) + "..."}</h3>;
   };
 
   const dateBodyTemplate = (rowData: ProcessedText) => {
@@ -106,14 +111,9 @@ const ProcessedTextTable = ({ userId }: Props) => {
     );
   };
 
-  const actionTranscribeBodyTemplate = (rowData: ProcessedText) => {
+  const actionShowEditBodyTemplate = (rowData: ProcessedText) => {
     return <></>;
     // return <TranscribeButton audioFile={rowData} />;
-  };
-
-  const actionProcessBodyTemplate = (rowData: ProcessedText) => {
-    return <></>;
-    // return <>{rowData.sttId && <ProcessTextButton sttId={rowData.sttId?.toString()} />}</>;
   };
 
   const header = (
@@ -143,8 +143,8 @@ const ProcessedTextTable = ({ userId }: Props) => {
             responsiveLayout="scroll"
           >
             <Column
-              field="fileName"
-              header="File Name"
+              field="summary"
+              header="Summary"
               sortable
               body={fileNameBodyTemplate}
               headerStyle={{ minWidth: "15rem" }}
@@ -162,13 +162,8 @@ const ProcessedTextTable = ({ userId }: Props) => {
               className="text-center"
             ></Column>
             <Column
-              header="Transcribe"
-              body={actionTranscribeBodyTemplate}
-              className="text-center"
-            ></Column>
-            <Column
-              header="Process"
-              body={actionProcessBodyTemplate}
+              header="Show"
+              body={actionShowEditBodyTemplate}
               className="text-center"
             ></Column>
           </DataTable>

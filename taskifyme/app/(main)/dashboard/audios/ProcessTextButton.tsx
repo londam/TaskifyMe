@@ -28,15 +28,16 @@ export default function ProcessTextButton({ sttId, userId }: Props) {
       setPrompt(fetchedContent);
 
       // Send the prompt to OpenAI
-      // !!const aiData = await sendToOpenAI(fetchedContent);
-      // !!setResponse(aiData.choices[0].message.content);
-      setResponse("It equals 5");
+      const aiData = await sendToOpenAI(fetchedContent);
+      const prompt = aiData.choices[0].message.content;
+      // const prompt = "now is really equal to 5";
+      setResponse(prompt);
 
       //save it to DB
-      await saveProcessedTextToDB(response, sttId, userId);
+      await saveProcessedTextToDB(prompt, sttId, userId);
 
       // Update user tokens with data from OpenAI response
-      //!!await updateUserTokens(userId, aiData.usage.total_tokens);
+      await updateUserTokens(userId, aiData.usage.total_tokens);
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
     } finally {

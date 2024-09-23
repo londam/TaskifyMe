@@ -32,6 +32,7 @@ export const saveProcessedTextToDB = async (
     //get audio, stt, and user
     const audioFileId = await getSTTAudioFile(sttId);
     console.log({ processedTextContent, sttId, userId, audioFileId });
+
     //save procTxt to DB
     const procTxt = await fetch(`/api/processedTexts`, {
       method: "POST",
@@ -40,6 +41,13 @@ export const saveProcessedTextToDB = async (
       },
       body: JSON.stringify({ processedTextContent, sttId, userId, audioFileId }),
     });
+
+    if (!procTxt.ok) {
+      // Handle the error response (e.g., log error, show a message)
+      const errorData = await procTxt.json();
+      console.error("Error creating processed text:", errorData);
+      throw new Error("Failed to create processed text");
+    }
 
     return procTxt;
   } catch (error) {

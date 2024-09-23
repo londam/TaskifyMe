@@ -54,7 +54,7 @@ export async function updateUserTokens(userId: string, tokens: number) {
 }
 
 export async function getSTTAudioFile(sttId: string) {
-  return await fetchSTTField(sttId, "audio");
+  return await fetchSTTField(sttId, "audioId");
 }
 
 export async function getSTTContent(sttId: string): Promise<any> {

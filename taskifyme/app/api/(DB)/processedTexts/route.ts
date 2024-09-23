@@ -12,6 +12,7 @@ import {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log("__________________________________________________");
     const { processedTextContent, sttId, userId, audioFileId } = body;
 
     if (!processedTextContent || !userId) {
@@ -20,7 +21,6 @@ export async function POST(request: NextRequest) {
 
     // 1 Connect to the database
     const mongooseInstance = await dbConnect(); // Connect and get the Mongoose instance
-    console.log("__________________________________________________");
     // 2 Create a processedText entry
     const processedText = await ProcessedTextModel.create({
       audioId: audioFileId,
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     await user.save();
 
     // 5 Find and update the STT document
-    await AudioFileModel.findByIdAndUpdate(sttId, {
+    await STTModel.findByIdAndUpdate(sttId, {
       processedTextId: processedText._id,
     });
 

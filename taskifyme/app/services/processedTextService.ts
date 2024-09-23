@@ -19,11 +19,11 @@ const deleteProcessedTextFromDB = async (processedTextId: string): Promise<void>
   }
 };
 
-export const deleteProcessedText = async (audioFileId: string) => {
-  await deleteProcessedTextFromDB(audioFileId);
+export const deleteProcessedText = async (processedTextId: string) => {
+  await deleteProcessedTextFromDB(processedTextId);
 };
 
-export const saveProcessedTextToDB = async (
+export const saveNewProcessedTextToDB = async (
   processedTextContent: string,
   sttId: string,
   userId: string
@@ -31,7 +31,7 @@ export const saveProcessedTextToDB = async (
   try {
     //get audio, stt, and user
     const audioFileId = await getSTTAudioFile(sttId);
-    console.log({ processedTextContent, sttId, userId, audioFileId });
+    // console.log({ processedTextContent, sttId, userId, audioFileId });
 
     //save procTxt to DB
     const procTxt = await fetch(`/api/processedTexts`, {
@@ -47,6 +47,33 @@ export const saveProcessedTextToDB = async (
       const errorData = await procTxt.json();
       console.error("Error creating processed text:", errorData);
       throw new Error("Failed to create processed text");
+    }
+
+    return procTxt;
+  } catch (error) {
+    throw new Error(handleError(error));
+  }
+};
+
+export const updateProcessedTextContentToDB = async (
+  processedTextContent: string,
+  processedTextId: string
+) => {
+  try {
+    //update procTxt to DB
+    const procTxt = await fetch(`/api/processedTexts/${processedTextId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ processedTextContent }),
+    });
+
+    if (!procTxt.ok) {
+      // Handle the error response (e.g., log error, show a message)
+      const errorData = await procTxt.json();
+      console.error("Error updating processed text:", errorData);
+      throw new Error("Failed to updating processed text");
     }
 
     return procTxt;

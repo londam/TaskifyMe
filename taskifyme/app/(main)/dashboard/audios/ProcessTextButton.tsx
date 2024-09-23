@@ -1,4 +1,4 @@
-import { saveProcessedTextToDB } from "@/app/services/processedTextService";
+import { saveNewProcessedTextToDB } from "@/app/services/processedTextService";
 import { getSTTContent, sendToOpenAI } from "@/app/services/sttService";
 import { updateUserTokens } from "@/app/services/userService";
 import { Button } from "primereact/button";
@@ -36,7 +36,7 @@ export default function ProcessTextButton({ sttId, userId }: Props) {
       setResponse(prompt);
 
       //save it to DB
-      await saveProcessedTextToDB(prompt, sttId, userId);
+      await saveNewProcessedTextToDB(prompt, sttId, userId);
 
       // Update user tokens with data from OpenAI response
       await updateUserTokens(userId, aiData.usage.total_tokens);

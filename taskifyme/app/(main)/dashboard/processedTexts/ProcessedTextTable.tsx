@@ -9,9 +9,15 @@ import React, { useEffect, useRef, useState } from "react";
 //
 import { ProcessedText } from "@/app/lib/mongodb/models";
 import { fetchUserProcessedTexts } from "@/app/services/userService";
-import { deleteProcessedText } from "@/app/services/processedTextService";
+import {
+  deleteProcessedText,
+  saveNewProcessedTextToDB,
+  updateProcessedTextContentToDB,
+} from "@/app/services/processedTextService";
 import { getFirstTagContent } from "@/app/utils/getFirstTagContent";
 import { Sidebar } from "primereact/sidebar";
+import { Editor } from "primereact/editor";
+import { InputText } from "primereact/inputtext";
 
 interface Props {
   userId: string;
@@ -32,6 +38,8 @@ const ProcessedTextTable = ({ userId }: Props) => {
   const [visibleRight, setVisibleRight] = useState(false);
 
   const [selectedRowData, setSelectedRowData] = useState<ProcessedText | null>(null); // New state for selected row
+  const [summaryContent, setSummaryContent] = useState<string>(""); // Rich text editor content
+  const [taskRows, setTaskRows] = useState<any[]>([]); // Tasks array
 
   useEffect(() => {
     const getProcessedTexts = async () => {
@@ -48,7 +56,7 @@ const ProcessedTextTable = ({ userId }: Props) => {
     getProcessedTexts();
   }, [refreshTable]);
 
-  // Function to trigger a refresh in the AudioTable component
+  // Function to trigger a refresh in the Table component
   const handleRefresh = () => {
     setRefreshTable((prev) => !prev); // Toggling state to trigger refresh
   };
@@ -124,15 +132,11 @@ const ProcessedTextTable = ({ userId }: Props) => {
         severity="success"
         className="mr-2"
         onClick={() => {
-          sidebarBodyTemplate(rowData);
-          setVisibleRight(true);
+          setSelectedRowData(rowData); // Store the clicked row's data
+          setVisibleRight(true); // Show the sidebar
         }}
       ></Button>
     );
-  };
-
-  const sidebarBodyTemplate = (rowData: ProcessedText) => {
-    <h1>{rowData.content}</h1>;
   };
 
   const header = (
@@ -140,6 +144,74 @@ const ProcessedTextTable = ({ userId }: Props) => {
       <h5 className="m-0">Manage Processed Texts</h5>
     </div>
   );
+
+  // Load row data into state when sidebar is opened
+  useEffect(() => {
+    if (selectedRowData) {
+      const content = JSON.parse(selectedRowData.content);
+      setSummaryContent(content.summary || "");
+      setTaskRows(content.tasks || []);
+    }
+  }, [selectedRowData]);
+
+  const handleSave = async () => {
+    if (selectedRowData) {
+      const updatedContent = JSON.stringify({
+        summary: summaryContent,
+        tasks: taskRows,
+      });
+
+      // Save the updated content back to the selected row's data
+      const updatedRowData = {
+        // If it's a Mongoose model, convert it to a plain object
+        ...(selectedRowData.toObject ? selectedRowData.toObject() : selectedRowData),
+        content: updatedContent,
+      };
+
+      setProcessedTexts((prevData) =>
+        prevData.map((item) => (item._id === selectedRowData._id ? updatedRowData : item))
+      );
+
+      updateProcessedTextContentToDB(updatedContent, updatedRowData._id);
+
+      toast.current?.show({
+        severity: "success",
+        summary: "Saved",
+        detail: "Changes have been saved successfully.",
+        life: 3000,
+      });
+      setVisibleRight(false);
+    }
+  };
+
+  const taskCheckboxTemplate = (rowData: any, rowIndex: number) => {
+    return (
+      <input
+        type="checkbox"
+        checked={rowData.completed}
+        onChange={(e) => {
+          const updatedTasks = [...taskRows];
+          updatedTasks[rowIndex].completed = e.target.checked;
+          setTaskRows(updatedTasks);
+        }}
+      />
+    );
+  };
+
+  const onTaskEditorValueChange = (e: any, rowIndex: number, field: string) => {
+    const updatedTasks = [...taskRows];
+    updatedTasks[rowIndex][field] = e.target.value;
+    setTaskRows(updatedTasks);
+  };
+
+  const taskEditorTemplate = (rowData: any, field: string, rowIndex: number) => {
+    return (
+      <InputText
+        value={rowData[field]}
+        onChange={(e) => onTaskEditorValueChange(e, rowIndex, field)}
+      />
+    );
+  };
 
   return (
     <div className="grid crud-demo">
@@ -211,7 +283,47 @@ const ProcessedTextTable = ({ userId }: Props) => {
           position="right"
           className="w-full"
         >
-          {sidebarBodyTemplate}
+          {selectedRowData ? (
+            <div>
+              <h2>Edit Summary</h2>
+              {/* Rich Text Editor */}
+              <Editor
+                value={summaryContent}
+                onTextChange={(e) => setSummaryContent(e.htmlValue || "")}
+                style={{ height: "200px" }}
+              />
+
+              <h2>Tasks</h2>
+              <DataTable value={taskRows} editMode="cell">
+                <Column
+                  field="taskName"
+                  header="Task Name"
+                  body={(rowData, { rowIndex }) =>
+                    taskEditorTemplate(rowData, "taskName", rowIndex)
+                  }
+                ></Column>
+                <Column
+                  field="taskDescription"
+                  header="Task Description"
+                  body={(rowData, { rowIndex }) =>
+                    taskEditorTemplate(rowData, "taskDescription", rowIndex)
+                  }
+                ></Column>
+                <Column
+                  field="dueDate"
+                  header="Due Date"
+                  body={(rowData, { rowIndex }) => taskEditorTemplate(rowData, "dueDate", rowIndex)}
+                ></Column>
+                <Column
+                  header="Completed"
+                  body={(rowData, { rowIndex }) => taskCheckboxTemplate(rowData, rowIndex)}
+                ></Column>
+              </DataTable>
+              <Button label="Save" icon="pi pi-save" onClick={handleSave} className="mt-3" />
+            </div>
+          ) : (
+            <p>No data selected</p>
+          )}
         </Sidebar>
       </div>
     </div>

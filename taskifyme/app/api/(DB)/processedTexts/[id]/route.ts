@@ -18,28 +18,35 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 //PUT for replacing object
 //PATCH for updating a property of an object
 
-// export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
-//   await dbConnect(); // Ensure database connection is established
-//   //validate the request body
-//   const body = await request.json();
-//   const validation = schema.safeParse(body);
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+  await dbConnect(); // Ensure database connection is established
+  //validate the request body
+  const body = await request.json();
+  const { processedTextContent } = body;
 
-//   if (!validation.success) return NextResponse.json(validation.error.errors, { status: 400 });
+  console.log(
+    "_____________________________SUCCESS modifying the db entry_____________________________",
+    processedTextContent
+  );
+  // update the audioFile
+  const updatedProcessedText = await ProcessedTextModel.findByIdAndUpdate(
+    params.id,
+    { content: processedTextContent },
+    {
+      new: true, // return the updated version
+    }
+  );
+  console.log(
+    "_____________________________SUCCESS modifying the db entry_____________________________",
+    updatedProcessedText._id
+  );
+  console.log(
+    "_____________________________SUCCESS modifying the db entry_____________________________",
+    updatedProcessedText.content
+  );
 
-//   // fetch audioFile with the given id
-//   const audioFile = await ProcessedTextModel.findById(params.id).select("-password");
-
-//   // if doesn't exit -> return 404
-//   if (!audioFile) return NextResponse.json({ error: "audioFile not found PUT" }, { status: 404 });
-
-//   // update the audioFile
-//   const updatedUser = await ProcessedTextModel.findByIdAndUpdate(params.id, validation.data, {
-//     new: true, // return the updated audioFile
-//     runValidators: true,
-//   });
-
-//   return NextResponse.json(updatedUser);
-// }
+  return NextResponse.json(updatedProcessedText);
+}
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   await dbConnect(); // Ensure database connection is established

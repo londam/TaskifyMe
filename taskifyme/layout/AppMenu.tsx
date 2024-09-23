@@ -20,7 +20,7 @@ const AppMenu = () => {
       items: [
         { label: "Audios", icon: "pi pi-fw pi-home", to: "/dashboard/audios" },
         { label: "STTs", icon: "pi pi-fw pi-home", to: "/dashboard/stts" },
-        { label: "Notes", icon: "pi pi-fw pi-home", to: "/dashboard/notes" },
+        { label: "Summaries", icon: "pi pi-fw pi-home", to: "/dashboard/summaries" },
         { label: "Tasks", icon: "pi pi-fw pi-home", to: "/dashboard/tasks" },
       ],
     },

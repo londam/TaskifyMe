@@ -5,21 +5,25 @@ import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
 import FileUploadPR from "./FileUploadPR";
+import { InputNumber, InputNumberValueChangeEvent } from "primereact/inputnumber";
+import { InputText } from "primereact/inputtext";
+import { InputTextarea } from "primereact/inputtextarea";
+import { RadioButton, RadioButtonChangeEvent } from "primereact/radiobutton";
 import { Toast } from "primereact/toast";
+import { Toolbar } from "primereact/toolbar";
+import { classNames } from "primereact/utils";
 import React, { useEffect, useRef, useState } from "react";
+import { Demo } from "@/types";
 //
 import { AudioFile } from "@/app/lib/mongodb/models";
-import AudioPlayer from "./AudioPlayer";
 import TranscribeButton from "./TranscribeButton";
 import ProcessTextButton from "./ProcessTextButton";
-import { fetchUserAudioFiles } from "@/app/services/userService";
-import { deleteAudioFile } from "@/app/services/audioFileService";
 
 interface Props {
   userId: string;
 }
 
-const AudioTablePR = ({ userId }: Props) => {
+const SummaryTable = ({ userId }: Props) => {
   const [refreshAudioTable, setRefreshAudioTable] = useState(false);
 
   const [deleteAudioDialog, setDeleteAudioDialog] = useState(false);
@@ -37,10 +41,16 @@ const AudioTablePR = ({ userId }: Props) => {
   // }, []);
 
   useEffect(() => {
-    const getAudioFiles = async () => {
+    const fetchAudioFiles = async () => {
       try {
-        const data = await fetchUserAudioFiles(userId);
-        setAudioFiles(data);
+        const response = await fetch(`/api/users/${userId}`); // Assuming the user GET endpoint returns audio files
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to fetch audio files");
+        }
+
+        setAudioFiles(data.audioFiles); // Assuming data.files is an array of filenames
       } catch (err) {
         console.error("Error fetching audio files:", err);
         setError("Failed to load audio files");
@@ -48,19 +58,17 @@ const AudioTablePR = ({ userId }: Props) => {
         setLoading(false);
       }
     };
-    getAudioFiles();
-  }, [refreshAudioTable]);
 
-  // Function to parse the file name and extract the date and initial file name
-  const parseFileName = (fileName: string) => {
-    const underscoreIndex = fileName.indexOf("_"); // Find the first occurrence of "_"
-    // Use slice to get everything after the first underscore
-    return fileName.slice(underscoreIndex + 1);
-  };
+    fetchAudioFiles();
+  }, [refreshAudioTable]);
 
   // Function to trigger a refresh in the AudioTable component
   const handleRefresh = () => {
     setRefreshAudioTable((prev) => !prev); // Toggling state to trigger refresh
+  };
+
+  const hideDeleteProductDialog = () => {
+    setDeleteAudioDialog(false);
   };
 
   const confirmDeleteProduct = (audioFile: AudioFile) => {
@@ -68,37 +76,53 @@ const AudioTablePR = ({ userId }: Props) => {
     setDeleteAudioDialog(true);
   };
 
-  const handleDelete = async () => {
+  const deleteProduct = () => {
     setDeleteAudioDialog(false);
+    handleDelete(audioToDelete!._id, audioToDelete!.fileName);
+    setAudioToDelete(null);
+    toast.current?.show({
+      severity: "success",
+      summary: "Successful",
+      detail: "Product Deleted",
+      life: 3000,
+    });
+  };
 
+  const handleDelete = async (fileId: string, fileName: string) => {
     try {
-      await deleteAudioFile(audioToDelete!._id, audioToDelete!.fileName);
-      // Update UI to reflect the deleted file
-      setAudioFiles((prevFiles) =>
-        prevFiles.filter((file) => file._id.toString() !== audioToDelete!._id)
-      );
-      setAudioToDelete(null);
-      toast.current?.show({
-        severity: "success",
-        summary: "Successful",
-        detail: "Product Deleted",
-        life: 3000,
+      // Step 1: Delete from MongoDB
+      const deleteFromDBResponse = await fetch(`/api/audios/${fileId}`, {
+        method: "DELETE",
       });
+
+      if (!deleteFromDBResponse.ok) {
+        throw new Error("Failed to delete file from MongoDB");
+      }
+
+      // Step 2: Delete from WebDisk
+      const deleteFromWebDiskResponse = await fetch(
+        `/api/webdisk?fileName=${encodeURIComponent(fileName)}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!deleteFromWebDiskResponse.ok) {
+        throw new Error("Failed to delete file from WebDisk");
+      }
+
+      // Update UI to reflect the deleted file
+      setAudioFiles((prevFiles) => prevFiles.filter((file) => file._id.toString() !== fileId));
     } catch (error) {
       console.error("Error deleting audio file:", error);
-      toast.current?.show({
-        severity: "error",
-        summary: "Delete Failed",
-        detail: "Failed to delete audio file.",
-        life: 3000,
-      });
+      alert("Failed to delete audio file. Please try again.");
     }
   };
 
   const deleteProductDialogFooter = (
     <>
-      <Button label="No" icon="pi pi-times" text onClick={() => setDeleteAudioDialog(false)} />
-      <Button label="Yes" icon="pi pi-check" text onClick={handleDelete} />
+      <Button label="No" icon="pi pi-times" text onClick={hideDeleteProductDialog} />
+      <Button label="Yes" icon="pi pi-check" text onClick={deleteProduct} />
     </>
   );
 
@@ -203,7 +227,7 @@ const AudioTablePR = ({ userId }: Props) => {
             header="Confirm"
             modal
             footer={deleteProductDialogFooter}
-            onHide={() => setDeleteAudioDialog(false)}
+            onHide={hideDeleteProductDialog}
           >
             <div className="flex align-items-center justify-content-center">
               <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: "2rem" }} />
@@ -220,4 +244,4 @@ const AudioTablePR = ({ userId }: Props) => {
   );
 };
 
-export default AudioTablePR;
+export default SummaryTable;

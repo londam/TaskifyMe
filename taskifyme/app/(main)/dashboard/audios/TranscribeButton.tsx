@@ -94,8 +94,6 @@ export default function TranscribeButton({ audioFile }: Props) {
           }),
         });
         const data = await response.json();
-        console.log("____________________POOLING_______________________________________");
-        console.log("data", data);
 
         if (data.status === "completed") {
           // Stop polling when transcription is completed

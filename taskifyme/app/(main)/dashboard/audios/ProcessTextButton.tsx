@@ -15,7 +15,6 @@ export default function ProcessTextButton({ sttId, userId }: Props) {
   const fetchSTT = async (sttId: string) => {
     try {
       setLoading(true);
-      console.log("URL: ***************************************** ", `/api/stts/${sttId}`);
 
       const response = await fetch(`/api/stts/${sttId}`); // Fetch from DB
       const data = await response.json();

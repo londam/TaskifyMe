@@ -6,9 +6,6 @@ import { AudioFileModel } from "@/app/lib/mongodb/models";
 
 export async function POST(request: NextRequest, response: NextResponse) {
   const { audioFileId } = await request.json();
-  console.log(
-    "____________________POOLING___IN______api/audio/transcribe______________________________"
-  );
 
   try {
     await dbConnect();

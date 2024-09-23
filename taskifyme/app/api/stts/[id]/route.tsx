@@ -8,7 +8,7 @@ import { STTModel } from "@/app/lib/mongodb/models";
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   //in RL fetch data from a db,
   await dbConnect(); // Ensure database connection is established
-  console.log("sttid: ***************************************** ", params.id);
+  console.log("sttid: ", params.id);
   const stt = await STTModel.findById(params.id);
 
   //if not found return 404

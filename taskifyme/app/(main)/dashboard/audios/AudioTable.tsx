@@ -116,17 +116,13 @@ export default function AudioTable({ userId, refresh }: Props) {
                   >
                     Delete
                   </button>
-                  {file.stt ? (
+                  {file.sttId ? (
                     <ProcessTextButton
-                      sttId={file.stt.toString()}
+                      sttId={file.sttId.toString()}
                       userId={userId}
                     ></ProcessTextButton>
                   ) : (
-                    <TranscribeButton
-                      fileName={file.fileName}
-                      userId={userId}
-                      audioFileId={file._id}
-                    />
+                    <TranscribeButton audioFile={file} />
                   )}
                 </td>
               </tr>

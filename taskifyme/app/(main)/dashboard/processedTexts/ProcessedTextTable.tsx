@@ -118,7 +118,7 @@ const ProcessedTextTable = ({ userId }: Props) => {
 
   const actionProcessBodyTemplate = (rowData: ProcessedText) => {
     return <></>;
-    // return <>{rowData.stt && <ProcessTextButton sttId={rowData.stt?.toString()} />}</>;
+    // return <>{rowData.sttId && <ProcessTextButton sttId={rowData.sttId?.toString()} />}</>;
   };
 
   const header = (

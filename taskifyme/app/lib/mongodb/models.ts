@@ -12,28 +12,6 @@ export interface User extends Document {
   minutes: Number;
 }
 
-export interface AudioFile extends Document {
-  _id: string; // Explicitly declare the _id field
-  fileName: string;
-  uploadedAt: Date;
-  userId: string;
-  stt?: mongoose.Types.ObjectId | STT;
-  processedText?: mongoose.Types.ObjectId | ProcessedText;
-  requestId?: string;
-}
-
-export interface STT extends Document {
-  _id: string; // Explicitly declare the _id field
-  audio: mongoose.Types.ObjectId | AudioFile;
-  content: string;
-}
-export interface ProcessedText extends Document {
-  _id: string; // Explicitly declare the _id field
-  audio: mongoose.Types.ObjectId | AudioFile;
-  content: string;
-  uploadedAt: Date;
-}
-
 export const UserSchema: Schema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
@@ -45,32 +23,67 @@ export const UserSchema: Schema = new Schema({
   minutes: { type: Number, required: true, default: 0 },
 });
 
+export const UserModel = mongoose.models.User || mongoose.model<User>("User", UserSchema);
+
+export interface AudioFile extends Document {
+  _id: string; // Explicitly declare the _id field
+  userId: string;
+  fileName: string;
+  uploadedAt: Date;
+  sttId?: string;
+  requestId?: string;
+  processedTextId?: string;
+}
+
 const AudioFileSchema: Schema = new Schema({
+  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   fileName: { type: String, required: true },
   uploadedAt: { type: Date, default: Date.now },
-  stt: { type: Schema.Types.ObjectId, ref: "STT", default: null },
+  sttId: { type: Schema.Types.ObjectId, ref: "STT" },
   requestId: { type: String, required: false },
-  userId: { type: String, required: true },
+  processedTextId: { type: Schema.Types.ObjectId, ref: "ProcessedText" },
 });
+
+export const AudioFileModel =
+  mongoose.models.AudioFile || mongoose.model<AudioFile>("AudioFile", AudioFileSchema);
+
+export interface STT extends Document {
+  _id: string; // Explicitly declare the _id field
+  userId: string;
+  audioId: mongoose.Types.ObjectId | AudioFile;
+  content: string;
+  uploadedAt: Date;
+  processedTextId?: string;
+}
 
 const STTSchema: Schema = new Schema({
-  audio: { type: Schema.Types.ObjectId, ref: "AudioFile", required: true },
-  content: { type: String, required: true },
-});
-
-const ProcessedTextSchema: Schema = new Schema({
-  audio: { type: Schema.Types.ObjectId, ref: "AudioFile", required: true },
+  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  audioId: { type: Schema.Types.ObjectId, ref: "AudioFile", required: true },
   content: { type: String, required: true },
   uploadedAt: { type: Date, default: Date.now },
+  processedTextId: { type: Schema.Types.ObjectId, ref: "ProcessedText", default: null },
 });
 
-// Export models
-const AudioFileModel =
-  mongoose.models.AudioFile || mongoose.model<AudioFile>("AudioFile", AudioFileSchema);
-const STTModel = mongoose.models.STT || mongoose.model<STT>("STT", STTSchema);
-const UserModel = mongoose.models.User || mongoose.model<User>("User", UserSchema);
-const ProcessedTextModel =
+export const STTModel = mongoose.models.STT || mongoose.model<STT>("STT", STTSchema);
+
+export interface ProcessedText extends Document {
+  _id: string; // Explicitly declare the _id field
+  audioId: string;
+  userId: string;
+  sttId: string;
+  uploadedAt: Date;
+  content: string;
+}
+
+const ProcessedTextSchema: Schema = new Schema({
+  audioId: { type: Schema.Types.ObjectId, ref: "AudioFile", required: true },
+  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  sttId: { type: Schema.Types.ObjectId, ref: "STT", required: true },
+  uploadedAt: { type: Date, default: Date.now },
+  content: { type: String, required: true },
+});
+
+export const ProcessedTextModel =
   mongoose.models.ProcessedText ||
   mongoose.model<ProcessedText>("ProcessedText", ProcessedTextSchema);
-
-export { AudioFileModel, STTModel, UserModel, ProcessedTextModel };
+// Export models

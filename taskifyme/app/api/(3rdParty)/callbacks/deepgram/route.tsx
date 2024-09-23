@@ -33,13 +33,14 @@ export async function POST(request: NextRequest) {
 
     // Step 2: Create a new STT entry in MongoDB
     const newSTT = await STTModel.create({
-      audio: audioFile._id,
+      audioId: audioFile._id,
+      userId: userId,
       content: transcript,
     });
 
     // Step 3: Update the corresponding AudioFile to link the STT
     await AudioFileModel.findByIdAndUpdate(audioFile._id, {
-      stt: newSTT._id,
+      sttId: newSTT._id,
       $unset: { requestId: "" }, // Remove the request_id field since we don't need it
     });
 

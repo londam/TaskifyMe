@@ -136,7 +136,9 @@ const AudioTablePR = ({ userId }: Props) => {
 
   const actionProcessBodyTemplate = (rowData: AudioFile) => {
     return (
-      <>{rowData.stt && <ProcessTextButton sttId={rowData.stt?.toString()} userId={userId} />}</>
+      <>
+        {rowData.sttId && <ProcessTextButton sttId={rowData.sttId?.toString()} userId={userId} />}
+      </>
     );
   };
 

@@ -25,9 +25,9 @@ export default function TranscribeButton({ audioFile }: Props) {
     if (sttContent !== "") {
       // Already fetched, just show the dialog
       setVisible(true);
-    } else if (audioFile.stt) {
+    } else if (audioFile.sttId) {
       // Not fetched yet, fetch it and then show the dialog
-      await fetchSTT(audioFile.stt.toString());
+      await fetchSTT(audioFile.sttId.toString());
       setVisible(true);
     }
   };
@@ -98,7 +98,7 @@ export default function TranscribeButton({ audioFile }: Props) {
         if (data.status === "completed") {
           // Stop polling when transcription is completed
           clearInterval(polling);
-          audioFile.stt = data.sttId; // Update the transcription content in state
+          audioFile.sttId = data.sttId; // Update the transcription content in state
           setIsTranscribing(false); // Update state to show transcription is done
           console.log("Transcription completed:", data.transcript);
         }
@@ -111,7 +111,7 @@ export default function TranscribeButton({ audioFile }: Props) {
 
   const transcribeButtonsBody = () => {
     //stt doesn't exist and it's not transcribing starting situation
-    if ((!isTranscribing || audioFile.requestId) && !audioFile.stt)
+    if ((!isTranscribing || audioFile.requestId) && !audioFile.sttId)
       return (
         <>
           <Button rounded severity="success" className="mr-2" onClick={handleTranscribe}>
@@ -136,7 +136,7 @@ export default function TranscribeButton({ audioFile }: Props) {
         </>
       );
     //it's transcribed and available
-    if (audioFile.stt)
+    if (audioFile.sttId)
       return (
         <>
           <Button

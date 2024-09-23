@@ -17,10 +17,10 @@ export async function POST(request: NextRequest, response: NextResponse) {
     }
 
     // Check if the STT (transcription) is available
-    if (audioFile.stt) {
-      return NextResponse.json({ status: "completed", sttId: audioFile.stt }, { status: 200 });
+    if (audioFile.sttId) {
+      return NextResponse.json({ status: "completed", sttId: audioFile.sttId }, { status: 200 });
     }
-    return NextResponse.json({ status: "pending", sttId: audioFile.stt }, { status: 200 });
+    return NextResponse.json({ status: "pending", sttId: audioFile.sttId }, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { status: "Error fetching transcription status", error },

@@ -1,24 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/app/lib/mongodb/dbConnect";
 //import { getSession } from 'next-auth/client'; // If you're using authentication
-import { UserModel, ProcessedTextModel, AudioFileModel } from "@/app/lib/mongodb/models"; // Import your models
+import {
+  UserModel,
+  ProcessedTextModel,
+  AudioFileModel,
+  STTModel,
+  AudioFile,
+} from "@/app/lib/mongodb/models"; // Import your models
 
 export async function POST(request: NextRequest) {
   try {
-    const { prompt, userId, audioFileId } = await request.json();
+    const body = await request.json();
+    const { processedTextContent, sttId, userId, audioFileId } = body;
 
-    if (!prompt || !userId) {
-      return NextResponse.json({ error: "Missing fileName or userId" }, { status: 400 });
+    if (!processedTextContent || !userId) {
+      return NextResponse.json({ error: "Missing prompt or userId" }, { status: 400 });
     }
 
     // 1 Connect to the database
     const mongooseInstance = await dbConnect(); // Connect and get the Mongoose instance
-
+    console.log("__________________________________________________");
     // 2 Create a processedText entry
     const processedText = await ProcessedTextModel.create({
-      audio: audioFileId,
+      audioId: audioFileId,
       userId: userId,
-      content: prompt,
+      content: processedTextContent,
+      sttId: sttId,
+    });
+    if (!processedText) {
+      return NextResponse.json({ error: "processedText not created!" }, { status: 404 });
+    }
+
+    // 4 Add the new proctxt  to the audiofile
+    await AudioFileModel.findByIdAndUpdate(audioFileId, {
+      processedTextId: processedText._id,
     });
 
     // 3 Find and update the User document
@@ -28,24 +44,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Add the new audio file to the user's list
+    // Add the new processed text to the user's list
     user.processedTexts.push(processedText._id);
     await user.save();
 
-    // 4 Find and update the User document
-    const audioFile = await AudioFileModel.findById(audioFileId);
-
-    if (!audioFile) {
-      return NextResponse.json({ error: "Audio not found" }, { status: 404 });
-    }
-
-    // Add the new audio file to the user's list
-    audioFile.ProcessedText.push(processedText._id);
-    await user.save();
+    // 5 Find and update the STT document
+    await AudioFileModel.findByIdAndUpdate(sttId, {
+      processedTextId: processedText._id,
+    });
 
     return NextResponse.json({
       success: true,
-      message: "File successfully uploaded and saved to user record",
+      message: "Processed text successfully saved to db",
     });
   } catch (error) {
     console.error("Error updating database:", error);

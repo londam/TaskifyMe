@@ -1,3 +1,5 @@
+import { saveProcessedTextToDB } from "@/app/services/processedTextService";
+import { getSTTContent, sendToOpenAI } from "@/app/services/sttService";
 import { updateUserTokens } from "@/app/services/userService";
 import { Button } from "primereact/button";
 import { InputTextarea } from "primereact/inputtextarea";
@@ -21,49 +23,30 @@ export default function ProcessTextButton({ sttId, userId }: Props) {
 
     //fetch data from DB
     try {
-      const response = await fetch(`/api/stts/${sttId}`); // Fetch from DB
-      const data = await response.json();
+      // Fetch STT content from the service
+      const fetchedContent = await getSTTContent(sttId);
+      setPrompt(fetchedContent);
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch STT");
-      }
+      // Send the prompt to OpenAI
+      // !!const aiData = await sendToOpenAI(fetchedContent);
+      // !!setResponse(aiData.choices[0].message.content);
+      setResponse("It equals 5");
 
-      setPrompt(data.content); // Assuming the API returns an STT with a content field
-    } catch (err) {
-      setError("Error fetching STT");
-      console.error("Error fetching STT:", err);
-    }
-    //send data to openAI
-    try {
-      const res = await fetch("/api/openai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt }),
-      });
+      //save it to DB
+      await saveProcessedTextToDB(response, sttId, userId);
 
-      const data = await res.json();
-
-      await updateUserTokens(userId, data.usage.total_tokens);
-
-      console.log("AI data", data);
-
-      if (!res.ok) {
-        setError(data.error || "Something went wrong.");
-      } else {
-        setResponse(data.choices[0].message.content);
-      }
-    } catch (err) {
-      setError("An unexpected error occurred.");
+      // Update user tokens with data from OpenAI response
+      //!!await updateUserTokens(userId, aiData.usage.total_tokens);
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred.");
     } finally {
       setLoading(false);
     }
   };
 
-  const debugTokensAndPropmtSave = async () => {
-    await updateUserTokens(userId, 269);
-  };
+  // const debugTokensAndPropmtSave = async () => {
+  //   await updateUserTokens(userId, 269);
+  // };
 
   return (
     <>
@@ -71,7 +54,7 @@ export default function ProcessTextButton({ sttId, userId }: Props) {
         Process via chatGPT
       </Button>
       {response && <Button className="btn btn-secondary btn-outline">View</Button>}
-      <Button onClick={debugTokensAndPropmtSave}>Debug Prompt</Button>
+      {/* <Button onClick={debugTokensAndPropmtSave}>Debug Prompt</Button> */}
       <InputTextarea value={response} className="w-full h-full" />
     </>
   );

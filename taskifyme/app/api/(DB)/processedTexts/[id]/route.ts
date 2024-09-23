@@ -24,10 +24,6 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   const body = await request.json();
   const { processedTextContent } = body;
 
-  console.log(
-    "_____________________________SUCCESS modifying the db entry_____________________________",
-    processedTextContent
-  );
   // update the audioFile
   const updatedProcessedText = await ProcessedTextModel.findByIdAndUpdate(
     params.id,
@@ -36,15 +32,6 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       new: true, // return the updated version
     }
   );
-  console.log(
-    "_____________________________SUCCESS modifying the db entry_____________________________",
-    updatedProcessedText._id
-  );
-  console.log(
-    "_____________________________SUCCESS modifying the db entry_____________________________",
-    updatedProcessedText.content
-  );
-
   return NextResponse.json(updatedProcessedText);
 }
 

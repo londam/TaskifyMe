@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import { Toast } from "primereact/toast";
-import { FileUpload } from "primereact/fileupload";
+import { FileUpload, FileUploadFile, FileUploadHandlerEvent } from "primereact/fileupload";
 
 import { useState } from "react";
 
@@ -15,10 +15,10 @@ const FileUploadPR = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
   const [success, setSuccess] = useState<string | null>(null);
 
   // Create a reference for FileUpload
-  const fileUploadRef = useRef(null);
+  const fileUploadRef = useRef<FileUpload>(null);
 
-  const handleUpload = async (event) => {
-    const handleFileUpload = async (file) => {
+  const handleUpload = async (event: FileUploadHandlerEvent) => {
+    const handleFileUpload = async (file: FileUploadFile) => {
       if (!file) return;
       setSuccess(null);
       setUploading(true);
@@ -63,11 +63,11 @@ const FileUploadPR = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
 
         // Call the onUploadSuccess callback to refresh AudioTable
         onUploadSuccess();
-        fileUploadRef.current.clear(); // Clear the file input
-        toast.current.show({ severity: "info", summary: "Success", detail: "File Uploaded" });
+        if (fileUploadRef.current) fileUploadRef.current.clear(); // Clear the file input
+        toast.current?.show({ severity: "info", summary: "Success", detail: "File Uploaded" });
       } catch (err) {
         setError("An error occurred during the upload");
-        toast.current.show({ severity: "error", summary: "Error", detail: "Error Upload Failed" });
+        toast.current?.show({ severity: "error", summary: "Error", detail: "Error Upload Failed" });
       }
     };
     event.files.map((file) => handleFileUpload(file));

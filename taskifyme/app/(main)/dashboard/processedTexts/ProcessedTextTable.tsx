@@ -11,13 +11,14 @@ import { ProcessedText } from "@/app/lib/mongodb/models";
 import { fetchUserProcessedTexts } from "@/app/services/userService";
 import { deleteProcessedText } from "@/app/services/processedTextService";
 import { getFirstTagContent } from "@/app/utils/getFirstTagContent";
+import { Sidebar } from "primereact/sidebar";
 
 interface Props {
   userId: string;
 }
 
 const ProcessedTextTable = ({ userId }: Props) => {
-  const [refreshAudioTable, setRefreshAudioTable] = useState(false);
+  const [refreshTable, setRefreshTable] = useState(false);
 
   const [deleteProcTextDialog, setDeleteProcTextDialog] = useState(false);
   const [procTextToDelete, setProcTextToDelete] = useState<ProcessedText | null>(null);
@@ -27,6 +28,10 @@ const ProcessedTextTable = ({ userId }: Props) => {
   const [processedTexts, setProcessedTexts] = useState<ProcessedText[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [visibleRight, setVisibleRight] = useState(false);
+
+  const [selectedRowData, setSelectedRowData] = useState<ProcessedText | null>(null); // New state for selected row
 
   useEffect(() => {
     const getProcessedTexts = async () => {
@@ -41,11 +46,11 @@ const ProcessedTextTable = ({ userId }: Props) => {
       }
     };
     getProcessedTexts();
-  }, [refreshAudioTable]);
+  }, [refreshTable]);
 
   // Function to trigger a refresh in the AudioTable component
   const handleRefresh = () => {
-    setRefreshAudioTable((prev) => !prev); // Toggling state to trigger refresh
+    setRefreshTable((prev) => !prev); // Toggling state to trigger refresh
   };
 
   const confirmDeleteProduct = (procTxt: ProcessedText) => {
@@ -112,8 +117,22 @@ const ProcessedTextTable = ({ userId }: Props) => {
   };
 
   const actionShowEditBodyTemplate = (rowData: ProcessedText) => {
-    return <></>;
-    // return <TranscribeButton audioFile={rowData} />;
+    return (
+      <Button
+        rounded
+        icon="pi pi-eye"
+        severity="success"
+        className="mr-2"
+        onClick={() => {
+          sidebarBodyTemplate(rowData);
+          setVisibleRight(true);
+        }}
+      ></Button>
+    );
+  };
+
+  const sidebarBodyTemplate = (rowData: ProcessedText) => {
+    <h1>{rowData.content}</h1>;
   };
 
   const header = (
@@ -185,6 +204,15 @@ const ProcessedTextTable = ({ userId }: Props) => {
             </div>
           </Dialog>
         </div>
+        <Sidebar
+          visible={visibleRight}
+          onHide={() => setVisibleRight(false)}
+          baseZIndex={1000}
+          position="right"
+          className="w-full"
+        >
+          {sidebarBodyTemplate}
+        </Sidebar>
       </div>
     </div>
   );

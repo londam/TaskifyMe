@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import schema from "../schema";
-import { SafeParseReturnType } from "zod";
 import dbConnect from "@/app/lib/mongodb/dbConnect";
 import { UserModel } from "@/app/lib/mongodb/models";
-import mongoose from "mongoose";
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   //in RL fetch data from a db,
@@ -67,4 +65,16 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     console.error("Error deleting user:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
+}
+
+export async function GETHelper(userId: string, field: string) {
+  //in RL fetch data from a db,
+  await dbConnect(); // Ensure database connection is established
+  const user = await UserModel.findById(userId).select(field).populate(field);
+
+  //if not found return 404
+  // else return data
+  if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+  return NextResponse.json(user, { status: 200 });
 }

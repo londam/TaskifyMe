@@ -7,6 +7,7 @@ export interface User extends Document {
   password?: string;
   audioFiles?: mongoose.Types.ObjectId[] | AudioFile[];
   stts?: mongoose.Types.ObjectId[] | STT[];
+  processedTexts?: mongoose.Types.ObjectId[] | ProcessedText[];
 }
 
 export interface AudioFile extends Document {
@@ -36,6 +37,7 @@ export const UserSchema: Schema = new Schema({
   password: { type: String, required: true },
   audioFiles: [{ type: Schema.Types.ObjectId, ref: "AudioFile" }],
   stts: [{ type: Schema.Types.ObjectId, ref: "STT" }],
+  processedTexts: [{ type: Schema.Types.ObjectId, ref: "ProcessedText" }],
 });
 
 const AudioFileSchema: Schema = new Schema({

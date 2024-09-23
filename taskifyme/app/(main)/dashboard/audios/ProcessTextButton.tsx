@@ -2,8 +2,9 @@ import { saveProcessedTextToDB } from "@/app/services/processedTextService";
 import { getSTTContent, sendToOpenAI } from "@/app/services/sttService";
 import { updateUserTokens } from "@/app/services/userService";
 import { Button } from "primereact/button";
-import { InputTextarea } from "primereact/inputtextarea";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+import { Toast } from "primereact/toast";
+
 //
 interface Props {
   sttId: string;
@@ -15,6 +16,7 @@ export default function ProcessTextButton({ sttId, userId }: Props) {
   const [response, setResponse] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const toast = useRef<Toast>(null);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -38,6 +40,13 @@ export default function ProcessTextButton({ sttId, userId }: Props) {
 
       // Update user tokens with data from OpenAI response
       await updateUserTokens(userId, aiData.usage.total_tokens);
+
+      toast.current?.show({
+        severity: "success",
+        summary: "Successful",
+        detail: "STT Transcript Processed!",
+        life: 3000,
+      });
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
     } finally {
@@ -51,6 +60,7 @@ export default function ProcessTextButton({ sttId, userId }: Props) {
 
   return (
     <>
+      <Toast ref={toast} />
       <Button className="btn btn-secondary btn-outline" onClick={handleSubmit}>
         Process via chatGPT
       </Button>

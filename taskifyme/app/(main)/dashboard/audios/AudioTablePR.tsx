@@ -31,11 +31,6 @@ const AudioTablePR = ({ userId }: Props) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // !! Better way of doing stuff is to get services into separate files
-  // useEffect(() => {
-  //   AudioFileService.getProducts().then((data) => setProducts(data as any));
-  // }, []);
-
   useEffect(() => {
     const getAudioFiles = async () => {
       try {

@@ -33,7 +33,7 @@ export const fetchUserProcessedTexts = async (userId: string): Promise<Processed
     throw new Error(data.error || "Failed to fetch STT files");
   }
 
-  return data.audioFiles;
+  return data.processedTexts;
 };
 
 const updateUser = async (userId: string, tokens = 0, minutes = 0) => {

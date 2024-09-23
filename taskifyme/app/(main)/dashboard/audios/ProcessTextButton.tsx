@@ -54,9 +54,6 @@ export default function ProcessTextButton({ sttId, userId }: Props) {
       <Button className="btn btn-secondary btn-outline" onClick={handleSubmit}>
         Process via chatGPT
       </Button>
-      {response && <Button className="btn btn-secondary btn-outline">View</Button>}
-      {/* <Button onClick={debugTokensAndPropmtSave}>Debug Prompt</Button> */}
-      <InputTextarea value={response} className="w-full h-full" />
     </>
   );
 }

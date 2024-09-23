@@ -27,11 +27,6 @@ const ProcessedTextTable = ({ userId }: Props) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // !! Better way of doing stuff is to get services into separate files
-  // useEffect(() => {
-  //   ProcessedTextService.getProducts().then((data) => setProducts(data as any));
-  // }, []);
-
   useEffect(() => {
     const getProcessedTexts = async () => {
       try {

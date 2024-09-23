@@ -16,6 +16,21 @@ export default function ProcessTextButton({ sttId }: Props) {
     setError(null);
     setResponse("");
 
+    //fetch data from DB
+    try {
+      const response = await fetch(`/api/stts/${sttId}`); // Fetch from DB
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch STT");
+      }
+
+      setPrompt(data.content); // Assuming the API returns an STT with a content field
+    } catch (err) {
+      setError("Error fetching STT");
+      console.error("Error fetching STT:", err);
+    }
+
     try {
       const res = await fetch("/api/openai", {
         method: "POST",
@@ -26,6 +41,7 @@ export default function ProcessTextButton({ sttId }: Props) {
       });
 
       const data = await res.json();
+      console.log("AI data", data);
 
       if (!res.ok) {
         setError(data.error || "Something went wrong.");

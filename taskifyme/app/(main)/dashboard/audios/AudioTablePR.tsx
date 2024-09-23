@@ -81,7 +81,7 @@ const AudioTablePR = ({ userId }: Props) => {
       toast.current?.show({
         severity: "success",
         summary: "Successful",
-        detail: "Product Deleted",
+        detail: "Audio File Deleted",
         life: 3000,
       });
     } catch (error) {
@@ -135,7 +135,9 @@ const AudioTablePR = ({ userId }: Props) => {
   };
 
   const actionProcessBodyTemplate = (rowData: AudioFile) => {
-    return <>{rowData.stt && <ProcessTextButton sttId={rowData.stt?.toString()} />}</>;
+    return (
+      <>{rowData.stt && <ProcessTextButton sttId={rowData.stt?.toString()} userId={userId} />}</>
+    );
   };
 
   const header = (

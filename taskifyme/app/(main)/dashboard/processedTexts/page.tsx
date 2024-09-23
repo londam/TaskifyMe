@@ -1,18 +1,18 @@
 "use client";
 import React from "react";
-import SummaryTable from "./SummaryTable";
+import ProcessedTextTable from "./ProcessedTextTable";
 
-const SummariesPage = () => {
+const ProcessedTextPage = () => {
   const userId = process.env.NEXT_PUBLIC_USER_ID;
 
   return (
     <>
-      <h1>Summaries Page</h1>
+      <h1>Processed Texts Page</h1>
       <div className="mt-5 bg-base-100 flex items-center justify-center">
-        <SummaryTable userId={userId!} />
+        <ProcessedTextTable userId={userId!} />
       </div>
     </>
   );
 };
 
-export default SummariesPage;
+export default ProcessedTextPage;

@@ -32,6 +32,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   // if doesn't exit -> return 404
   if (!user) return NextResponse.json({ error: "user not found PUT" }, { status: 404 });
 
+  if (!validation.data.tokens) validation.data.tokens = user.tokens;
+  if (!validation.data.minutes) validation.data.minutes = user.minutes;
+
   // update the user
   const updatedUser = await UserModel.findByIdAndUpdate(params.id, validation.data, {
     new: true, // return the updated user
@@ -39,6 +42,33 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   });
 
   return NextResponse.json(updatedUser);
+}
+
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    await dbConnect(); // Ensure database connection is established
+    //validate the request body
+    const body = await request.json();
+    const { tokens, minutes } = body;
+
+    // fetch user with the given id
+    const user = await UserModel.findById(params.id).select("-password");
+
+    // if doesn't exit -> return 404
+    if (!user) return NextResponse.json({ error: "user not found PUT" }, { status: 404 });
+
+    user.tokens += parseInt(tokens);
+    user.minutes += parseInt(minutes);
+
+    // update the user
+    await user.save();
+
+    console.log(user.tokens, user.minutes);
+    return NextResponse.json(user);
+  } catch (error) {
+    console.error("Error updating user:", error);
+    return NextResponse.json({ error: "Failed to update user" }, { status: 500 });
+  }
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {

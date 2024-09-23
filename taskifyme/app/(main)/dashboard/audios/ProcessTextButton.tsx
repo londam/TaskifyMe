@@ -1,12 +1,14 @@
+import { updateUserTokens } from "@/app/services/userService";
 import { Button } from "primereact/button";
 import { InputTextarea } from "primereact/inputtextarea";
 import React, { useState } from "react";
 //
 interface Props {
   sttId: string;
+  userId: string;
 }
 //
-export default function ProcessTextButton({ sttId }: Props) {
+export default function ProcessTextButton({ sttId, userId }: Props) {
   const [prompt, setPrompt] = useState<string>("");
   const [response, setResponse] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -42,6 +44,9 @@ export default function ProcessTextButton({ sttId }: Props) {
       });
 
       const data = await res.json();
+
+      await updateUserTokens(userId, data.usage.total_tokens);
+
       console.log("AI data", data);
 
       if (!res.ok) {
@@ -56,12 +61,17 @@ export default function ProcessTextButton({ sttId }: Props) {
     }
   };
 
+  const debugTokensAndPropmtSave = async () => {
+    await updateUserTokens(userId, 269);
+  };
+
   return (
     <>
       <Button className="btn btn-secondary btn-outline" onClick={handleSubmit}>
         Process via chatGPT
       </Button>
       {response && <Button className="btn btn-secondary btn-outline">View</Button>}
+      <Button onClick={debugTokensAndPropmtSave}>Debug Prompt</Button>
       <InputTextarea value={response} className="w-full h-full" />
     </>
   );

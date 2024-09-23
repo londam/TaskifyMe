@@ -10,6 +10,8 @@ export async function POST(request: Request) {
     // Parse the incoming request body
     const { prompt } = await request.json();
 
+    if (!prompt) throw new Error("prompt missing!::::::::::::::::::::::::");
+
     // Retrieve the OpenAI API key from environment variables
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY, // This is also the default, can be omitted
@@ -26,7 +28,7 @@ export async function POST(request: Request) {
         { role: "user", content: prompt },
       ],
       temperature: 0.7,
-      max_tokens: 1500,
+      max_tokens: 3000,
       n: 1,
       stop: null,
     });

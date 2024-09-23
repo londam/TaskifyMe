@@ -4,92 +4,81 @@ import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
-import FileUploadPR from "./FileUploadPR";
 import { Toast } from "primereact/toast";
 import React, { useEffect, useRef, useState } from "react";
 //
-import { AudioFile } from "@/app/lib/mongodb/models";
-import AudioPlayer from "./AudioPlayer";
-import TranscribeButton from "./TranscribeButton";
-import ProcessTextButton from "./ProcessTextButton";
-import { fetchUserAudioFiles } from "@/app/services/userService";
-import { deleteAudioFile } from "@/app/services/audioFileService";
+import { ProcessedText } from "@/app/lib/mongodb/models";
+import { fetchUserProcessedTexts } from "@/app/services/userService";
+import { deleteProcessedText } from "@/app/services/processedTextService";
 
 interface Props {
   userId: string;
 }
 
-const AudioTablePR = ({ userId }: Props) => {
+const ProcessedTextTable = ({ userId }: Props) => {
   const [refreshAudioTable, setRefreshAudioTable] = useState(false);
 
-  const [deleteAudioDialog, setDeleteAudioDialog] = useState(false);
-  const [audioToDelete, setAudioToDelete] = useState<AudioFile | null>(null);
+  const [deleteProcTextDialog, setDeleteProcTextDialog] = useState(false);
+  const [procTextToDelete, setProcTextToDelete] = useState<ProcessedText | null>(null);
   const toast = useRef<Toast>(null);
   const dt = useRef<DataTable<any>>(null);
 
-  const [audioFiles, setAudioFiles] = useState<AudioFile[]>([]);
+  const [processedTexts, setProcessedTexts] = useState<ProcessedText[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // !! Better way of doing stuff is to get services into separate files
   // useEffect(() => {
-  //   AudioFileService.getProducts().then((data) => setProducts(data as any));
+  //   ProcessedTextService.getProducts().then((data) => setProducts(data as any));
   // }, []);
 
   useEffect(() => {
-    const getAudioFiles = async () => {
+    const getProcessedTexts = async () => {
       try {
-        const data = await fetchUserAudioFiles(userId);
-        setAudioFiles(data);
+        const data = await fetchUserProcessedTexts(userId);
+        setProcessedTexts(data);
       } catch (err) {
-        console.error("Error fetching audio files:", err);
-        setError("Failed to load audio files");
+        console.error("Error fetching processed texts", err);
+        setError("Failed to load processed texts");
       } finally {
         setLoading(false);
       }
     };
-    getAudioFiles();
+    getProcessedTexts();
   }, [refreshAudioTable]);
-
-  // Function to parse the file name and extract the date and initial file name
-  const parseFileName = (fileName: string) => {
-    const underscoreIndex = fileName.indexOf("_"); // Find the first occurrence of "_"
-    // Use slice to get everything after the first underscore
-    return fileName.slice(underscoreIndex + 1);
-  };
 
   // Function to trigger a refresh in the AudioTable component
   const handleRefresh = () => {
     setRefreshAudioTable((prev) => !prev); // Toggling state to trigger refresh
   };
 
-  const confirmDeleteProduct = (audioFile: AudioFile) => {
-    setAudioToDelete(audioFile);
-    setDeleteAudioDialog(true);
+  const confirmDeleteProduct = (procTxt: ProcessedText) => {
+    setProcTextToDelete(procTxt);
+    setDeleteProcTextDialog(true);
   };
 
   const handleDelete = async () => {
-    setDeleteAudioDialog(false);
+    setDeleteProcTextDialog(false);
 
     try {
-      await deleteAudioFile(audioToDelete!._id, audioToDelete!.fileName);
+      await deleteProcessedText(procTextToDelete!._id);
       // Update UI to reflect the deleted file
-      setAudioFiles((prevFiles) =>
-        prevFiles.filter((file) => file._id.toString() !== audioToDelete!._id)
+      setProcessedTexts((prevFiles) =>
+        prevFiles.filter((file) => file._id.toString() !== procTextToDelete!._id)
       );
-      setAudioToDelete(null);
+      setProcTextToDelete(null);
       toast.current?.show({
         severity: "success",
         summary: "Successful",
-        detail: "Product Deleted",
+        detail: "Processed Text Deleted",
         life: 3000,
       });
     } catch (error) {
-      console.error("Error deleting audio file:", error);
+      console.error("Error deleting processed text:", error);
       toast.current?.show({
         severity: "error",
         summary: "Delete Failed",
-        detail: "Failed to delete audio file.",
+        detail: "Failed to delete processed text.",
         life: 3000,
       });
     }
@@ -97,28 +86,20 @@ const AudioTablePR = ({ userId }: Props) => {
 
   const deleteProductDialogFooter = (
     <>
-      <Button label="No" icon="pi pi-times" text onClick={() => setDeleteAudioDialog(false)} />
+      <Button label="No" icon="pi pi-times" text onClick={() => setDeleteProcTextDialog(false)} />
       <Button label="Yes" icon="pi pi-check" text onClick={handleDelete} />
     </>
   );
 
-  const fileNameBodyTemplate = (rowData: AudioFile) => {
-    return <p>{parseFileName(rowData.fileName)}</p>;
+  const fileNameBodyTemplate = (rowData: ProcessedText) => {
+    return <p>{rowData.content.slice(0, 20)}</p>;
   };
 
-  const dateBodyTemplate = (rowData: AudioFile) => {
+  const dateBodyTemplate = (rowData: ProcessedText) => {
     return <p>{new Date(rowData.uploadedAt).toLocaleDateString()}</p>;
   };
 
-  const playerBodyTemplate = (rowData: AudioFile) => {
-    return (
-      <>
-        <AudioPlayer audioFileId={rowData._id} />
-      </>
-    );
-  };
-
-  const actionDeleteBodyTemplate = (rowData: AudioFile) => {
+  const actionDeleteBodyTemplate = (rowData: ProcessedText) => {
     return (
       <Button
         className="mr-2"
@@ -130,18 +111,19 @@ const AudioTablePR = ({ userId }: Props) => {
     );
   };
 
-  const actionTranscribeBodyTemplate = (rowData: AudioFile) => {
-    return <TranscribeButton audioFile={rowData} />;
+  const actionTranscribeBodyTemplate = (rowData: ProcessedText) => {
+    return <></>;
+    // return <TranscribeButton audioFile={rowData} />;
   };
 
-  const actionProcessBodyTemplate = (rowData: AudioFile) => {
-    return <>{rowData.stt && <ProcessTextButton sttId={rowData.stt?.toString()} />}</>;
+  const actionProcessBodyTemplate = (rowData: ProcessedText) => {
+    return <></>;
+    // return <>{rowData.stt && <ProcessTextButton sttId={rowData.stt?.toString()} />}</>;
   };
 
   const header = (
     <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-      <h5 className="m-0">Manage Audios</h5>
-      <FileUploadPR onUploadSuccess={handleRefresh} />
+      <h5 className="m-0">Manage Processed Texts</h5>
     </div>
   );
 
@@ -152,7 +134,7 @@ const AudioTablePR = ({ userId }: Props) => {
           <Toast ref={toast} />
           <DataTable
             ref={dt}
-            value={audioFiles}
+            value={processedTexts}
             selectionMode="single"
             dataKey="_id"
             paginator
@@ -179,7 +161,6 @@ const AudioTablePR = ({ userId }: Props) => {
               body={dateBodyTemplate}
               headerStyle={{ minWidth: "7rem" }}
             ></Column>
-            <Column body={playerBodyTemplate} headerStyle={{ minWidth: "8rem" }}></Column>
             <Column
               header="Delete"
               body={actionDeleteBodyTemplate}
@@ -198,19 +179,17 @@ const AudioTablePR = ({ userId }: Props) => {
           </DataTable>
 
           <Dialog
-            visible={deleteAudioDialog}
+            visible={deleteProcTextDialog}
             style={{ width: "450px" }}
             header="Confirm"
             modal
             footer={deleteProductDialogFooter}
-            onHide={() => setDeleteAudioDialog(false)}
+            onHide={() => setDeleteProcTextDialog(false)}
           >
             <div className="flex align-items-center justify-content-center">
               <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: "2rem" }} />
-              {audioToDelete && (
-                <span>
-                  Are you sure you want to delete <b>{audioToDelete.fileName}</b>?
-                </span>
+              {procTextToDelete && (
+                <span>Are you sure you want to delete this Processed Text?</span>
               )}
             </div>
           </Dialog>
@@ -220,4 +199,4 @@ const AudioTablePR = ({ userId }: Props) => {
   );
 };
 
-export default AudioTablePR;
+export default ProcessedTextTable;

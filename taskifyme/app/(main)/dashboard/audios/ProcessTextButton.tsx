@@ -3,59 +3,47 @@ import React, { useState } from "react";
 //
 interface Props {
   sttId: string;
-  userId: string;
 }
 //
-export default function ProcessTextButton({ sttId, userId }: Props) {
-  const [sttContent, setSttContent] = useState<string | null>(null);
+export default function ProcessTextButton({ sttId }: Props) {
+  const [prompt, setPrompt] = useState<string>("");
+  const [response, setResponse] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [showContent, setShowContent] = useState(true);
 
-  const fetchSTT = async (sttId: string) => {
+  const handleSubmit = async () => {
+    setLoading(true);
+    setError(null);
+    setResponse("");
+
     try {
-      setLoading(true);
+      const res = await fetch("/api/openai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      });
 
-      const response = await fetch(`/api/stts/${sttId}`); // Fetch from DB
-      const data = await response.json();
+      const data = await res.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch STT");
+      if (!res.ok) {
+        setError(data.error || "Something went wrong.");
+      } else {
+        setResponse(data.choices[0].text.trim());
       }
-
-      setSttContent(data.content); // Assuming the API returns an STT with a content field
     } catch (err) {
-      setError("Error fetching STT");
-      console.error("Error fetching STT:", err);
+      setError("An unexpected error occurred.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleShowTranscription = () => {
-    if (!sttContent) {
-      fetchSTT(sttId); // Fetch transcription if not already fetched
-    } else setShowContent(!showContent);
-  };
-
   return (
     <>
-      <>
-        <Button className="btn btn-secondary" onClick={handleShowTranscription}>
-          {sttContent && showContent ? "Hide transcription" : "Show transcription"}
-        </Button>
-
-        {loading && <p>Loading transcription...</p>}
-        {error && <p>{error}</p>}
-
-        {sttContent && showContent && (
-          <div>
-            <p>{sttContent}</p> {/* Display the transcription */}
-          </div>
-        )}
-
-        <Button className="btn btn-secondary btn-outline">Process transcription via chatGPT</Button>
-      </>
+      <Button className="btn btn-secondary btn-outline" onClick={handleSubmit}>
+        Process via chatGPT
+      </Button>
     </>
   );
 }

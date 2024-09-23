@@ -12,6 +12,7 @@
     "@deepgram/sdk": "^3.7.0",
     "mongoose": "^8.6.3",
     "next": "14.2.12",
+    "openai": "^4.63.0",
     "primeflex": "^3.3.1",
     "primeicons": "^6.0.1",
     "primereact": "10.8.3",

@@ -167,13 +167,7 @@ const AudioTablePR = ({ userId }: Props) => {
   };
 
   const actionProcessBodyTemplate = (rowData: AudioFile) => {
-    return (
-      <>{rowData.stt && <ProcessTextButton sttId={rowData.stt?.toString()} userId={userId} />}</>
-    );
-  };
-
-  const actionSummarizeBodyTemplate = (rowData: AudioFile) => {
-    // return <TranscribeButton audioFile={rowData} />;
+    return <>{rowData.stt && <ProcessTextButton sttId={rowData.stt?.toString()} />}</>;
   };
 
   const header = (
@@ -231,11 +225,6 @@ const AudioTablePR = ({ userId }: Props) => {
             <Column
               header="Process"
               body={actionProcessBodyTemplate}
-              className="text-center"
-            ></Column>
-            <Column
-              header="Summarize"
-              body={actionSummarizeBodyTemplate}
               className="text-center"
             ></Column>
           </DataTable>

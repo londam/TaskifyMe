@@ -109,7 +109,6 @@ const FileUploadPR = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
         accept="audio/*"
         customUpload
         uploadHandler={handleUpload}
-        auto={false} // Set to false if you want to manually trigger uploads
         onUpload={() => console.log("uploaded File")}
       />
       {error && <p className="text-red-500 mt-2">{error}</p>}

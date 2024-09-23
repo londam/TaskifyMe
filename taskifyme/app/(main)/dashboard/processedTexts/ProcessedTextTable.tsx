@@ -45,7 +45,12 @@ const ProcessedTextTable = ({ userId }: Props) => {
     const getProcessedTexts = async () => {
       try {
         const data = await fetchUserProcessedTexts(userId);
-        setProcessedTexts(data);
+        setProcessedTexts(
+          data.map((processedText) => ({
+            ...(processedText.toObject ? processedText.toObject() : processedText),
+            content: JSON.parse(processedText.content),
+          }))
+        );
       } catch (err) {
         console.error("Error fetching processed texts", err);
         setError("Failed to load processed texts");
@@ -101,8 +106,13 @@ const ProcessedTextTable = ({ userId }: Props) => {
   );
 
   const fileNameBodyTemplate = (rowData: ProcessedText) => {
-    const content = JSON.parse(rowData.content);
-    const title = getFirstTagContent(content.summary) + " ";
+    let title = "";
+    try {
+      const content = JSON.parse(rowData.content);
+      title = getFirstTagContent(content.summary) + " ";
+    } catch (error) {
+      title = "";
+    }
     if (title.length <= 1) return <p className="text-lg">"..."</p>;
     if (title.length < 40) return <p className="text-lg">{title}</p>;
     return <p className="text-lg">{title.slice(0, 37) + "..."}</p>;
@@ -134,6 +144,7 @@ const ProcessedTextTable = ({ userId }: Props) => {
         onClick={() => {
           setSelectedRowData(rowData); // Store the clicked row's data
           setVisibleRight(true); // Show the sidebar
+          console.log(rowData);
         }}
       ></Button>
     );
@@ -148,7 +159,12 @@ const ProcessedTextTable = ({ userId }: Props) => {
   // Load row data into state when sidebar is opened
   useEffect(() => {
     if (selectedRowData) {
-      const content = JSON.parse(selectedRowData.content);
+      let content = "";
+      try {
+        content = JSON.parse(selectedRowData.content);
+      } catch (error) {
+        content = selectedRowData.content;
+      }
       setSummaryContent(content.summary || "");
       setTaskRows(content.tasks || []);
     }
@@ -298,21 +314,21 @@ const ProcessedTextTable = ({ userId }: Props) => {
                 <Column
                   field="taskName"
                   header="Task Name"
-                  body={(rowData, { rowIndex }) =>
-                    taskEditorTemplate(rowData, "taskName", rowIndex)
-                  }
+                  body={(rowData, { rowIndex }) => taskEditorTemplate(rowData, "title", rowIndex)}
                 ></Column>
                 <Column
                   field="taskDescription"
                   header="Task Description"
                   body={(rowData, { rowIndex }) =>
-                    taskEditorTemplate(rowData, "taskDescription", rowIndex)
+                    taskEditorTemplate(rowData, "description", rowIndex)
                   }
                 ></Column>
                 <Column
                   field="dueDate"
                   header="Due Date"
-                  body={(rowData, { rowIndex }) => taskEditorTemplate(rowData, "dueDate", rowIndex)}
+                  body={(rowData, { rowIndex }) =>
+                    taskEditorTemplate(rowData, "date_time", rowIndex)
+                  }
                 ></Column>
                 <Column
                   header="Completed"

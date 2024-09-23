@@ -167,7 +167,7 @@ export default function TranscribeButton({ audioFile }: Props) {
           value={sttContent}
           onChange={(e) => setSttContent(e.target.value)}
           rows={10}
-          className="w-full"
+          className="w-full h-full"
         />
       </Dialog>
     </div>

@@ -1,4 +1,5 @@
 import { Button } from "primereact/button";
+import { InputTextarea } from "primereact/inputtextarea";
 import React, { useState } from "react";
 //
 interface Props {
@@ -30,7 +31,7 @@ export default function ProcessTextButton({ sttId }: Props) {
       setError("Error fetching STT");
       console.error("Error fetching STT:", err);
     }
-
+    //send data to openAI
     try {
       const res = await fetch("/api/openai", {
         method: "POST",
@@ -46,7 +47,7 @@ export default function ProcessTextButton({ sttId }: Props) {
       if (!res.ok) {
         setError(data.error || "Something went wrong.");
       } else {
-        setResponse(data.choices[0].text.trim());
+        setResponse(data.choices[0].message.content);
       }
     } catch (err) {
       setError("An unexpected error occurred.");
@@ -60,6 +61,8 @@ export default function ProcessTextButton({ sttId }: Props) {
       <Button className="btn btn-secondary btn-outline" onClick={handleSubmit}>
         Process via chatGPT
       </Button>
+      {response && <Button className="btn btn-secondary btn-outline">View</Button>}
+      <InputTextarea value={response} className="w-full h-full" />
     </>
   );
 }

@@ -34,18 +34,6 @@ export async function POST(request: Request) {
     console.log("AI response", chatCompletion);
 
     return NextResponse.json(chatCompletion);
-
-    // Check if the response is successful
-    if (!response.ok) {
-      const errorData = await response.json();
-      return NextResponse.json({ error: errorData }, { status: response.status });
-    }
-
-    // Parse the response from OpenAI
-    const data = await response.json();
-
-    // Return the OpenAI response to the client
-    return NextResponse.json(data);
   } catch (error: any) {
     console.error("Error in /api/chat route:", error);
     return NextResponse.json(

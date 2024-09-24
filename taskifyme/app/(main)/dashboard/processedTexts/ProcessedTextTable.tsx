@@ -11,7 +11,6 @@ import { ProcessedText } from "@/app/lib/mongodb/models";
 import { fetchUserProcessedTexts } from "@/app/services/userService";
 import {
   deleteProcessedText,
-  saveNewProcessedTextToDB,
   updateProcessedTextContentToDB,
 } from "@/app/services/processedTextService";
 import { getFirstTagContent } from "@/app/utils/getFirstTagContent";
@@ -19,9 +18,22 @@ import { Sidebar } from "primereact/sidebar";
 import { Editor } from "primereact/editor";
 import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
+import { InputTextarea } from "primereact/inputtextarea";
+import { v4 as uuidv4 } from "uuid"; // At the top of your file
+import { FloatLabel } from "primereact/floatlabel";
+import { Checkbox } from "primereact/checkbox";
+import { ToggleButton } from "primereact/togglebutton";
 
 interface Props {
   userId: string;
+}
+
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  date_time: Date | null;
+  completed: boolean;
 }
 
 const ProcessedTextTable = ({ userId }: Props) => {
@@ -42,6 +54,7 @@ const ProcessedTextTable = ({ userId }: Props) => {
   const [summaryContent, setSummaryContent] = useState<string>(""); // Rich text editor content
   const [taskRows, setTaskRows] = useState<any[]>([]); // Tasks array
 
+  // Fetch processed texts
   useEffect(() => {
     const getProcessedTexts = async () => {
       try {
@@ -49,7 +62,10 @@ const ProcessedTextTable = ({ userId }: Props) => {
         setProcessedTexts(
           data.map((processedText) => ({
             ...(processedText.toObject ? processedText.toObject() : processedText),
-            content: JSON.parse(processedText.content),
+            content:
+              typeof processedText.content === "string"
+                ? JSON.parse(processedText.content)
+                : processedText.content,
           }))
         );
       } catch (err) {
@@ -60,7 +76,7 @@ const ProcessedTextTable = ({ userId }: Props) => {
       }
     };
     getProcessedTexts();
-  }, [refreshTable]);
+  }, [refreshTable, userId]);
 
   // Function to trigger a refresh in the Table component
   const handleRefresh = () => {
@@ -106,10 +122,10 @@ const ProcessedTextTable = ({ userId }: Props) => {
     </>
   );
 
+  // Template for displaying file name
   const fileNameBodyTemplate = (rowData: ProcessedText) => {
     let title = "";
     try {
-      // const content = JSON.parse(rowData.content);
       title = getFirstTagContent(rowData.content.summary) + " ";
     } catch (error) {
       title = "Add Title";
@@ -119,10 +135,12 @@ const ProcessedTextTable = ({ userId }: Props) => {
     return <p className="text-lg">{title.slice(0, 37) + "..."}</p>;
   };
 
+  // Template for displaying date
   const dateBodyTemplate = (rowData: ProcessedText) => {
     return <p>{new Date(rowData.uploadedAt).toLocaleDateString()}</p>;
   };
 
+  // Template for delete action
   const actionDeleteBodyTemplate = (rowData: ProcessedText) => {
     return (
       <Button
@@ -135,6 +153,7 @@ const ProcessedTextTable = ({ userId }: Props) => {
     );
   };
 
+  // Template for show/edit action
   const actionShowEditBodyTemplate = (rowData: ProcessedText) => {
     return (
       <Button
@@ -145,7 +164,7 @@ const ProcessedTextTable = ({ userId }: Props) => {
         onClick={() => {
           setSelectedRowData(rowData); // Store the clicked row's data
           setVisibleRight(true); // Show the sidebar
-          console.log(rowData);
+          // console.log(rowData);
         }}
       ></Button>
     );
@@ -160,23 +179,36 @@ const ProcessedTextTable = ({ userId }: Props) => {
   // Load row data into state when sidebar is opened
   useEffect(() => {
     if (selectedRowData) {
-      let content = "";
-      try {
-        content = JSON.parse(selectedRowData.content);
-      } catch (error) {
+      let content: any = "";
+      // Check if 'content' is a string (needs parsing) or already an object
+      if (typeof selectedRowData.content === "string") {
+        try {
+          content = JSON.parse(selectedRowData.content);
+        } catch (error) {
+          content = selectedRowData.content;
+        }
+      } else {
         content = selectedRowData.content;
       }
+
+      // Ensure each task has a unique 'id'
+      const tasksWithIds = (content.tasks || []).map((task: Task) => ({
+        ...task,
+        id: task.id || uuidv4(), // Retain existing 'id' or generate a new one
+      }));
+
+      // Update state variables
       setSummaryContent(content.summary || "");
-      setTaskRows(content.tasks || []);
+      setTaskRows(tasksWithIds || []);
     }
   }, [selectedRowData]);
 
   const handleSave = async () => {
     if (selectedRowData) {
-      const updatedContent = JSON.stringify({
+      const updatedContent = {
         summary: summaryContent,
         tasks: taskRows,
-      });
+      };
 
       // Save the updated content back to the selected row's data
       const updatedRowData = {
@@ -185,75 +217,63 @@ const ProcessedTextTable = ({ userId }: Props) => {
         content: updatedContent,
       };
 
+      // Update state with content as an object
       setProcessedTexts((prevData) =>
         prevData.map((item) => (item._id === selectedRowData._id ? updatedRowData : item))
       );
 
-      updateProcessedTextContentToDB(updatedContent, updatedRowData._id);
+      try {
+        // Stringify content only for database update
+        const updatedContentString = JSON.stringify(updatedContent);
+        await updateProcessedTextContentToDB(updatedContentString, updatedRowData._id);
 
-      toast.current?.show({
-        severity: "success",
-        summary: "Saved",
-        detail: "Changes have been saved successfully.",
-        life: 3000,
-      });
+        toast.current?.show({
+          severity: "success",
+          summary: "Saved",
+          detail: "Changes have been saved successfully.",
+          life: 3000,
+        });
+      } catch (error) {
+        console.error("Error updating processed text:", error);
+        toast.current?.show({
+          severity: "error",
+          summary: "Update Failed",
+          detail: "Failed to update processed text.",
+          life: 3000,
+        });
+      }
       setVisibleRight(false);
     }
   };
 
-  const taskCheckboxTemplate = (rowData: any, rowIndex: number) => {
-    return (
-      <input
-        type="checkbox"
-        checked={rowData.completed}
-        onChange={(e) => {
-          const updatedTasks = [...taskRows];
-          updatedTasks[rowIndex].completed = e.target.checked;
-          setTaskRows(updatedTasks);
-        }}
-      />
-    );
-  };
-
-  const onTaskEditorValueChange = (e: any, rowIndex: number, field: string) => {
+  // Handle changes in task input fields
+  const onTaskEditorValueChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { value: Date },
+    index: number,
+    field: keyof Task
+  ) => {
     const updatedTasks = [...taskRows];
-    updatedTasks[rowIndex][field] = e.target.value;
+    if (field === "date_time" && "value" in e) {
+      updatedTasks[index][field] = e.value;
+    } else if ("target" in e) {
+      updatedTasks[index][field] = e.target.value;
+    }
     setTaskRows(updatedTasks);
   };
 
-  const taskEditorTitleTemplate = (rowData: any, field: string, rowIndex: number) => {
-    return (
-      <InputText
-        value={rowData[field]}
-        onChange={(e) => onTaskEditorValueChange(e, rowIndex, field)}
-      />
-    );
+  const handleAddTask = () => {
+    const newTask: Task = {
+      id: uuidv4(),
+      title: "",
+      description: "",
+      date_time: null,
+      completed: false,
+    };
+    setTaskRows((prevTasks) => [...prevTasks, newTask]);
   };
 
-  const taskEditorDescrTemplate = (rowData: any, field: string, rowIndex: number) => {
-    return (
-      <InputText
-        value={rowData[field]}
-        onChange={(e) => onTaskEditorValueChange(e, rowIndex, field)}
-      />
-    );
-  };
-
-  const taskEditorCalendarTemplate = (rowData: any, field: string, rowIndex: number) => {
-    // Safely convert the ISO string to a Date object if it exists, otherwise null
-    const value = rowData[field] ? new Date(rowData[field]) : null;
-
-    return (
-      <div>
-        <Calendar
-          value={value} // Calendar expects a Date object
-          onChange={(e) => onTaskEditorValueChange(e, rowIndex, field)}
-          dateFormat="dd/mm/yy"
-          showTime
-          hourFormat="24"
-        />
-      </div>
-    );
+  const handleDeleteTask = (id: string) => {
+    setTaskRows((prevTasks) => prevTasks.filter((task) => task.id !== id));
   };
 
   return (
@@ -272,7 +292,7 @@ const ProcessedTextTable = ({ userId }: Props) => {
             className="datatable-responsive"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-            emptyMessage="No products found."
+            emptyMessage="No processed texts found."
             header={header}
             responsiveLayout="scroll"
           >
@@ -337,34 +357,87 @@ const ProcessedTextTable = ({ userId }: Props) => {
               />
 
               <h2>Tasks</h2>
-              <DataTable value={taskRows} editMode="cell">
-                <Column
-                  field="taskName"
-                  header="Task Name"
-                  body={(rowData, { rowIndex }) =>
-                    taskEditorTitleTemplate(rowData, "title", rowIndex)
-                  }
-                ></Column>
-                <Column
-                  field="taskDescription"
-                  header="Task Description"
-                  body={(rowData, { rowIndex }) =>
-                    taskEditorDescrTemplate(rowData, "description", rowIndex)
-                  }
-                ></Column>
-                <Column
-                  field="dueDate"
-                  header="Due Date"
-                  body={(rowData, { rowIndex }) =>
-                    taskEditorCalendarTemplate(rowData, "date_time", rowIndex)
-                  }
-                ></Column>
-                <Column
-                  header="Completed"
-                  body={(rowData, { rowIndex }) => taskCheckboxTemplate(rowData, rowIndex)}
-                ></Column>
-              </DataTable>
-              <Button label="Save" icon="pi pi-save" onClick={handleSave} className="mt-3" />
+
+              {taskRows.map((task, index) => (
+                <div key={index} className="flex mb-3 pt-3">
+                  {/* Title & Date Column */}
+                  <div className="flex flex-column" style={{ flex: 1 }}>
+                    <div className="pb-4">
+                      <FloatLabel>
+                        <InputText
+                          id="title"
+                          value={task.title}
+                          onChange={(e) => onTaskEditorValueChange(e, index, "title")}
+                          style={{ width: "100%" }}
+                        />
+                        <label htmlFor="title">Title</label>
+                      </FloatLabel>
+                    </div>
+                    <div>
+                      <FloatLabel className="py-0 m-0">
+                        <Calendar
+                          className="py-0 m-0"
+                          id="calendar"
+                          value={task.date_time ? new Date(task.date_time) : null}
+                          onChange={(e) => onTaskEditorValueChange(e, index, "date_time")}
+                          dateFormat="dd/mm/yy"
+                          showTime
+                          hourFormat="24"
+                          placeholder="Date Time"
+                          style={{ width: "100%", marginTop: "0.5rem" }}
+                        />
+                        <label htmlFor="calendar">Date & Time</label>
+                      </FloatLabel>
+                    </div>
+                  </div>
+
+                  {/* Description Column */}
+                  <div className="flex" style={{ flex: 2, marginLeft: "1rem" }}>
+                    <FloatLabel style={{ width: "100%" }}>
+                      <InputTextarea
+                        id="description"
+                        value={task.description}
+                        onChange={(e) => onTaskEditorValueChange(e, index, "description")}
+                        rows={4}
+                        placeholder="Description"
+                        style={{ width: "100%" }}
+                      />
+                      <label htmlFor="description">Description</label>
+                    </FloatLabel>
+                  </div>
+
+                  {/* Checkbox Column */}
+                  <div className="flex align-items-center" style={{ marginLeft: "1rem" }}>
+                    <Checkbox
+                      onChange={(e) => {
+                        const updatedTasks = [...taskRows];
+                        updatedTasks[index].completed = e.target.checked;
+                        setTaskRows(updatedTasks);
+                      }}
+                      checked={task.completed}
+                    ></Checkbox>
+                  </div>
+
+                  {/* Delete Button Column */}
+                  <div className="flex align-items-center" style={{ marginLeft: "1rem" }}>
+                    <Button
+                      icon="pi pi-trash"
+                      className="p-button-rounded p-button-danger"
+                      onClick={() => handleDeleteTask(task.id)}
+                    />
+                  </div>
+                </div>
+              ))}
+
+              <div className="flex justify-content-end mt-3">
+                <Button
+                  label="Add Task"
+                  icon="pi pi-plus"
+                  onClick={handleAddTask}
+                  className="mr-2"
+                />
+                <Button label="Save" icon="pi pi-save" onClick={handleSave} />
+              </div>
             </div>
           ) : (
             <p>No data selected</p>

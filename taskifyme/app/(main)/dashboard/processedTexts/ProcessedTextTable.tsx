@@ -109,10 +109,10 @@ const ProcessedTextTable = ({ userId }: Props) => {
   const fileNameBodyTemplate = (rowData: ProcessedText) => {
     let title = "";
     try {
-      const content = JSON.parse(rowData.content);
-      title = getFirstTagContent(content.summary) + " ";
+      // const content = JSON.parse(rowData.content);
+      title = getFirstTagContent(rowData.content.summary) + " ";
     } catch (error) {
-      title = "";
+      title = "Add Title";
     }
     if (title.length <= 1) return <p className="text-lg">"..."</p>;
     if (title.length < 40) return <p className="text-lg">{title}</p>;

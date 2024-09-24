@@ -138,7 +138,7 @@ const AudioTablePR = ({ userId }: Props) => {
   };
 
   const header = (
-    <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+    <div className="flex flex-row flex-nowrap justify-content-between align-items-center">
       <h5 className="m-0">Manage Audios</h5>
       <FileUploadPR onUploadSuccess={handleRefresh} />
     </div>
@@ -162,7 +162,7 @@ const AudioTablePR = ({ userId }: Props) => {
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
             emptyMessage="No products found."
             header={header}
-            responsiveLayout="scroll"
+            responsiveLayout="stack"
           >
             <Column
               field="fileName"
@@ -178,7 +178,10 @@ const AudioTablePR = ({ userId }: Props) => {
               body={dateBodyTemplate}
               headerStyle={{ minWidth: "7rem" }}
             ></Column>
-            <Column body={playerBodyTemplate} headerStyle={{ minWidth: "8rem" }}></Column>
+            <Column
+              body={playerBodyTemplate}
+              headerStyle={{ minWidth: "8rem", width: "18rem" }}
+            ></Column>
             <Column
               header="Delete"
               body={actionDeleteBodyTemplate}

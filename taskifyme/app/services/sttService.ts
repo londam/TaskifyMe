@@ -1,3 +1,5 @@
+import { handleError } from "../utils/errorHandler";
+
 export async function fetchSTTField(sttId: string, field: string): Promise<any> {
   try {
     const response = await fetch(`/api/stts/${sttId}`); // Fetch from DB
@@ -60,3 +62,27 @@ export async function getSTTAudioFile(sttId: string) {
 export async function getSTTContent(sttId: string): Promise<any> {
   return await fetchSTTField(sttId, "content");
 }
+
+export const updateSTTtContentToDB = async (sttContent: string, sttId: string) => {
+  try {
+    //update stt to DB
+    const stt = await fetch(`/api/stts/${sttId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ sttContent }),
+    });
+
+    if (!stt.ok) {
+      // Handle the error response (e.g., log error, show a message)
+      const errorData = await stt.json();
+      console.error("Error updating processed text:", errorData);
+      throw new Error("Failed to updating processed text");
+    }
+
+    return stt;
+  } catch (error) {
+    throw new Error(handleError(error));
+  }
+};

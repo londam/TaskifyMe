@@ -3,8 +3,10 @@ import { AudioFile } from "@/app/lib/mongodb/models";
 import { Button } from "primereact/button";
 import React, { useEffect, useRef, useState } from "react";
 import { Dialog } from "primereact/dialog";
-import ProcessTextButton from "./ProcessTextButton";
 import { InputTextarea } from "primereact/inputtextarea";
+import { Toast } from "primereact/toast";
+import { updateSTTtContentToDB } from "@/app/services/sttService";
+
 //
 interface Props {
   audioFile: AudioFile;
@@ -18,6 +20,7 @@ export default function TranscribeButton({ audioFile }: Props) {
   //
   const [isTranscribing, setIsTranscribing] = useState(false); // Track transcription state
   const POLLING_INTERVAL = 2500; // Poll every 5 seconds
+  const toast = useRef<Toast>(null);
 
   const handleShowingTranscription = async () => {
     console.log("sttContent", sttContent);
@@ -109,6 +112,20 @@ export default function TranscribeButton({ audioFile }: Props) {
     }, POLLING_INTERVAL);
   };
 
+  const handleDialogSave = async () => {
+    if (audioFile.sttId) {
+      await updateSTTtContentToDB(sttContent, audioFile.sttId.toString());
+    }
+
+    toast.current?.show({
+      severity: "success",
+      summary: "Saved",
+      detail: "Changes have been saved successfully.",
+      life: 4000,
+    });
+    setVisible(false);
+  };
+
   const transcribeButtonsBody = () => {
     //stt doesn't exist and it's not transcribing starting situation
     if ((!isTranscribing || audioFile.requestId) && !audioFile.sttId)
@@ -152,6 +169,8 @@ export default function TranscribeButton({ audioFile }: Props) {
 
   return (
     <div>
+      <Toast ref={toast} />
+
       {transcribeButtonsBody()}
 
       <Dialog
@@ -169,6 +188,7 @@ export default function TranscribeButton({ audioFile }: Props) {
           rows={10}
           className="w-full h-full"
         />
+        <Button label="Save" icon="pi pi-save" onClick={handleDialogSave} className="mt-3" />
       </Dialog>
     </div>
   );

@@ -68,6 +68,8 @@ const FileUploadPR = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
       } catch (err) {
         setError("An error occurred during the upload");
         toast.current?.show({ severity: "error", summary: "Error", detail: "Error Upload Failed" });
+      } finally {
+        setUploading(false);
       }
     };
     event.files.map((file) => handleFileUpload(file));
@@ -99,6 +101,7 @@ const FileUploadPR = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
   return (
     <div>
       <Toast ref={toast}></Toast>
+      {uploading && <p>Uploading...</p>}
       <FileUpload
         ref={fileUploadRef} // Attach the ref to the FileUpload component
         mode="basic"

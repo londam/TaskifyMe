@@ -409,6 +409,7 @@ const ProcessedTextTable = ({ userId }: Props) => {
                   {/* Checkbox Column */}
                   <div className="flex align-items-center" style={{ marginLeft: "1rem" }}>
                     <Checkbox
+                      id="checkbox"
                       onChange={(e) => {
                         const updatedTasks = [...taskRows];
                         updatedTasks[index].completed = e.target.checked;

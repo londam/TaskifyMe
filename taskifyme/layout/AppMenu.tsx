@@ -11,72 +11,76 @@ const AppMenu = () => {
   const { layoutConfig } = useContext(LayoutContext);
 
   const model: AppMenuItem[] = [
-    {
-      label: "Home",
-      items: [{ label: "Dashboard", icon: "pi pi-fw pi-home", to: "/dashboard" }],
-    },
+    // {
+    //   label: "Home",
+    //   items: [{ label: "Dashboard", icon: "pi pi-fw pi-home", to: "/dashboard" }],
+    // },
     {
       label: "TaskifyME",
       items: [
-        { label: "Audios", icon: "pi pi-fw pi-home", to: "/dashboard/audios" },
-        { label: "STTs", icon: "pi pi-fw pi-home", to: "/dashboard/stts" },
-        { label: "Processed Texts", icon: "pi pi-fw pi-home", to: "/dashboard/processedTexts" },
-        { label: "Tasks", icon: "pi pi-fw pi-home", to: "/dashboard/tasks" },
+        { label: "Audios", icon: "pi pi-fw pi-microphone", to: "/dashboard/audios" },
+        // { label: "STTs", icon: "pi pi-fw pi-home", to: "/dashboard/stts" },
+        {
+          label: "Processed Texts",
+          icon: "pi pi-fw pi-align-justify",
+          to: "/dashboard/processedTexts",
+        },
+        // { label: "Tasks", icon: "pi pi-fw pi-home", to: "/dashboard/tasks" },
       ],
     },
-    {
-      label: "Pages",
-      icon: "pi pi-fw pi-briefcase",
-      to: "/pages",
-      items: [
-        {
-          label: "Landing",
-          icon: "pi pi-fw pi-globe",
-          to: "/",
-        },
-        {
-          label: "Auth",
-          icon: "pi pi-fw pi-user",
-          items: [
-            {
-              label: "Login",
-              icon: "pi pi-fw pi-sign-in",
-              to: "/auth/login",
-            },
-            {
-              label: "Error",
-              icon: "pi pi-fw pi-times-circle",
-              to: "/auth/error",
-            },
-            {
-              label: "Access Denied",
-              icon: "pi pi-fw pi-lock",
-              to: "/auth/access",
-            },
-          ],
-        },
-        {
-          label: "Crud",
-          icon: "pi pi-fw pi-pencil",
-          to: "/pages/crud",
-        },
-        {
-          label: "Timeline",
-          icon: "pi pi-fw pi-calendar",
-          to: "/pages/timeline",
-        },
-        {
-          label: "Not Found",
-          icon: "pi pi-fw pi-exclamation-circle",
-          to: "/pages/notfound",
-        },
-        {
-          label: "Empty",
-          icon: "pi pi-fw pi-circle-off",
-          to: "/pages/empty",
-        },
-      ],
-    },
+    // {
+    //   label: "Pages",
+    //   icon: "pi pi-fw pi-briefcase",
+    //   to: "/pages",
+    //   items: [
+    //     {
+    //       label: "Landing",
+    //       icon: "pi pi-fw pi-globe",
+    //       to: "/",
+    //     },
+    //     {
+    //       label: "Auth",
+    //       icon: "pi pi-fw pi-user",
+    //       items: [
+    //         {
+    //           label: "Login",
+    //           icon: "pi pi-fw pi-sign-in",
+    //           to: "/auth/login",
+    //         },
+    //         {
+    //           label: "Error",
+    //           icon: "pi pi-fw pi-times-circle",
+    //           to: "/auth/error",
+    //         },
+    //         {
+    //           label: "Access Denied",
+    //           icon: "pi pi-fw pi-lock",
+    //           to: "/auth/access",
+    //         },
+    //       ],
+    //     },
+    //     {
+    //       label: "Crud",
+    //       icon: "pi pi-fw pi-pencil",
+    //       to: "/pages/crud",
+    //     },
+    //     {
+    //       label: "Timeline",
+    //       icon: "pi pi-fw pi-calendar",
+    //       to: "/pages/timeline",
+    //     },
+    //     {
+    //       label: "Not Found",
+    //       icon: "pi pi-fw pi-exclamation-circle",
+    //       to: "/pages/notfound",
+    //     },
+    //     {
+    //       label: "Empty",
+    //       icon: "pi pi-fw pi-circle-off",
+    //       to: "/pages/empty",
+    //     },
+    //   ],
+    // },
   ];
 
   return (

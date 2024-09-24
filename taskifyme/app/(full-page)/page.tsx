@@ -33,11 +33,13 @@ const Homepage = () => {
               src={`/layout/images/${
                 layoutConfig.colorScheme === "light" ? "logo-dark" : "logo-white"
               }.svg`}
-              alt="Sakai Logo"
+              alt="Taskify me Logo"
               height="50"
               className="mr-0 lg:mr-2"
             />
-            <span className="text-900 font-medium text-2xl line-height-3 mr-8">SAK AI</span>
+            <span className="text-900 font-medium text-2xl line-height-3 mr-8">
+              <span className="text-indigo-500">TASKIFY</span>me
+            </span>
           </Link>
           <StyleClass
             nodeRef={menuRef as NodeRef}
@@ -121,36 +123,51 @@ const Homepage = () => {
           className="flex flex-column pt-4 px-4 lg:px-8 overflow-hidden"
           style={{
             background:
-              "linear-gradient(0deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)), radial-gradient(77.36% 256.97% at 77.36% 57.52%, #EEEFAF 0%, #C3E3FA 100%)",
+              "linear-gradient(0deg, rgba(236, 72, 153, 0.2), rgba(6,182,212, 0.2)), radial-gradient(77.36% 256.97% at 77.36% 57.52%, #EC4899 0%, #06B6D4 100%)",
             clipPath: "ellipse(150% 87% at 93% 13%)",
+            height: "300 px",
           }}
         >
-          <div className="mx-4 md:mx-8 mt-0 md:mt-4">
-            <h1 className="text-6xl font-bold text-gray-900 line-height-2">
-              <span className="font-light block">Eu sem integer</span>eget magna fermentum
-            </h1>
-            <p className="font-normal text-2xl line-height-3 md:mt-3 text-gray-700">
-              Sed blandit libero volutpat sed cras. Fames ac turpis egestas integer. Placerat in
-              egestas erat...{" "}
-            </p>
-            <Button
-              type="button"
-              label="Get Started"
-              rounded
-              className="text-xl border-none mt-3 bg-blue-500 font-normal line-height-3 px-3 text-white"
-            ></Button>
+          <div id="hero-txt" className="flex flex-col justify-center">
+            <div className="mx-4 md:mx-8 mt-10 md:mt-4">
+              <h1
+                className="text-6xl font-bold text-gray-100 line-height-2"
+                style={{ marginTop: "30px" }}
+              >
+                <span className="font-light block">Voice Your Tasks</span>Into Action!
+              </h1>
+              <p className="font-normal text-2xl line-height-3 md:mt-3 text-gray-200 width">
+                Take control of your time with Taskify Me!<br></br>
+                Plan, organize, and track your<br></br>
+                tasks effortlessly.
+              </p>
+              <Button
+                type="button"
+                label="Get Started"
+                rounded
+                className="text-xl border-none mt-3 bg-blue-500 font-normal line-height-3 px-3 text-white"
+              ></Button>
+            </div>
           </div>
-          <div className="flex justify-content-center md:justify-content-end">
-            <img src="/images/landing/screen-1.png" alt="Hero Image" className="w-9 md:w-auto" />
+          <div
+            className="flex justify-content-center md:justify-content-end"
+            style={{ marginTop: "-200px" }}
+          >
+            <img
+              src="/images/home/screen-1.png"
+              alt="Hero Image"
+              className="w-9 md:w-auto"
+              // height="600"
+            />
           </div>
         </div>
 
         <div id="features" className="py-4 px-4 lg:px-8 mt-5 mx-0 lg:mx-8">
           <div className="grid justify-content-center">
-            <div className="col-12 text-center mt-8 mb-4">
+            {/* <div className="col-12 text-center mt-8 mb-4">
               <h2 className="text-900 font-normal mb-2">Marvelous Features</h2>
               <span className="text-600 text-2xl">Placerat in egestas erat...</span>
-            </div>
+            </div> */}
 
             <div className="col-12 md:col-12 lg:col-4 p-0 lg:pr-5 lg:pb-5 mt-4 lg:mt-0">
               <div
@@ -164,17 +181,17 @@ const Homepage = () => {
               >
                 <div className="p-3 surface-card h-full" style={{ borderRadius: "8px" }}>
                   <div
-                    className="flex align-items-center justify-content-center bg-yellow-200 mb-3"
+                    className="flex align-items-center justify-content-center bg-pink-500 mb-3"
                     style={{
                       width: "3.5rem",
                       height: "3.5rem",
                       borderRadius: "10px",
                     }}
                   >
-                    <i className="pi pi-fw pi-users text-2xl text-yellow-700"></i>
+                    <i className="pi pi-fw pi-th-large text-2xl text-pink-100"></i>
                   </div>
-                  <h5 className="mb-2 text-900">Easy to Use</h5>
-                  <span className="text-600">Posuere morbi leo urna molestie.</span>
+                  <h5 className="mb-2 text-900">Intuitive Interface</h5>
+                  <span className="text-600">Easily manage your to-dos and deadlines.</span>
                 </div>
               </div>
             </div>
@@ -191,17 +208,17 @@ const Homepage = () => {
               >
                 <div className="p-3 surface-card h-full" style={{ borderRadius: "8px" }}>
                   <div
-                    className="flex align-items-center justify-content-center bg-cyan-200 mb-3"
+                    className="flex align-items-center justify-content-center bg-primary-500 mb-3"
                     style={{
                       width: "3.5rem",
                       height: "3.5rem",
                       borderRadius: "10px",
                     }}
                   >
-                    <i className="pi pi-fw pi-palette text-2xl text-cyan-700"></i>
+                    <i className="pi pi-fw pi-pencil text-2xl text-primary-100"></i>
                   </div>
-                  <h5 className="mb-2 text-900">Fresh Design</h5>
-                  <span className="text-600">Semper risus in hendrerit.</span>
+                  <h5 className="mb-2 text-900">Smart Reminders</h5>
+                  <span className="text-600">Never forget an important task again.</span>
                 </div>
               </div>
             </div>
@@ -218,21 +235,21 @@ const Homepage = () => {
               >
                 <div className="p-3 surface-card h-full" style={{ borderRadius: "8px" }}>
                   <div
-                    className="flex align-items-center justify-content-center bg-indigo-200"
+                    className="flex align-items-center justify-content-center bg-indigo-600"
                     style={{
                       width: "3.5rem",
                       height: "3.5rem",
                       borderRadius: "10px",
                     }}
                   >
-                    <i className="pi pi-fw pi-map text-2xl text-indigo-700"></i>
+                    <i className="pi pi-fw pi-sliders-h text-2xl text-indigo-100"></i>
                   </div>
-                  <h5 className="mb-2 text-900">Well Documented</h5>
-                  <span className="text-600">Non arcu risus quis varius quam quisque.</span>
+                  <h5 className="mb-2 text-900">Customization</h5>
+                  <span className="text-600">Tailor the app to fit your needs and work style.</span>
                 </div>
               </div>
             </div>
-
+            {/* 
             <div className="col-12 md:col-12 lg:col-4 p-0 lg:pr-5 lg:pb-5 mt-4 lg:mt-0">
               <div
                 style={{
@@ -393,68 +410,77 @@ const Homepage = () => {
                   <span className="text-600">Neque egestas congue quisque.</span>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             <div
               className="col-12 mt-8 mb-8 p-2 md:p-8"
               style={{
                 borderRadius: "20px",
-                background:
-                  "linear-gradient(0deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), radial-gradient(77.36% 256.97% at 77.36% 57.52%, #EFE1AF 0%, #C3DCFA 100%)",
+                background: "linear-gradient(90deg, #06B6D4, #5457CD)",
               }}
             >
               <div className="flex flex-column justify-content-center align-items-center text-center px-3 py-3 md:py-0">
-                <h3 className="text-gray-900 mb-2">Joséphine Miller</h3>
-                <span className="text-gray-600 text-2xl">Peak Interactive</span>
+                <h3 className="text-gray-200 mb-2">Joséphine Miller</h3>
+                <span className="text-gray-300 text-2xl">app user</span>
                 <p
-                  className="text-gray-900 sm:line-height-2 md:line-height-4 text-2xl mt-4"
+                  className="text-gray-200 sm:line-height-2 md:line-height-4 text-2xl mt-4"
                   style={{ maxWidth: "800px" }}
                 >
-                  “Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                  fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-                  culpa qui officia deserunt mollit anim id est laborum.”
+                  “Taskify Me is a game-changer for anyone looking to boost productivity. Its
+                  intuitive interface makes managing tasks simple and stress-free. The customizable
+                  features, like smart reminders and personalized task categories, help keep
+                  everything organized.”
                 </p>
-                <img src="/images/landing/peak-logo.svg" className="mt-4" alt="Company logo" />
               </div>
             </div>
           </div>
         </div>
 
         <div id="highlights" className="py-4 px-4 lg:px-8 mx-0 my-6 lg:mx-8">
-          <div className="text-center">
+          {/* <div className="text-center">
             <h2 className="text-900 font-normal mb-2">Powerful Everywhere</h2>
             <span className="text-600 text-2xl">Amet consectetur adipiscing elit...</span>
-          </div>
+          </div> */}
 
           <div className="grid mt-8 pb-2 md:pb-8">
             <div
-              className="flex justify-content-center col-12 lg:col-6 bg-purple-100 p-0 flex-order-1 lg:flex-order-0"
-              style={{ borderRadius: "8px" }}
+              className="flex justify-content-end col-12 lg:col-6 bg-pink-500 flex-order-1 lg:flex-order-0"
+              style={{ borderRadius: "8px", marginRight: "5%", paddingTop: "15%" }}
             >
-              <img src="/images/landing/mockup.svg" className="w-11" alt="mockup mobile" />
+              <img
+                src="/images/home/mockup.png"
+                className="w-11"
+                alt="mockup mobile"
+                style={{ marginRight: "-15%", marginBottom: "-15%" }}
+              />
             </div>
 
-            <div className="col-12 lg:col-6 my-auto flex flex-column lg:align-items-end text-center lg:text-right">
+            <div className="col-12 lg:col-5 my-auto flex flex-column lg:align-items-end text-center lg:text-right">
               <div
-                className="flex align-items-center justify-content-center bg-purple-200 align-self-center lg:align-self-end"
+                className="flex align-items-center justify-content-center bg-pink-500 align-self-center lg:align-self-end"
                 style={{
                   width: "4.2rem",
                   height: "4.2rem",
                   borderRadius: "10px",
                 }}
               >
-                <i className="pi pi-fw pi-mobile text-5xl text-purple-700"></i>
+                <i className="pi pi-fw pi-desktop text-5xl text-indigo-100"></i>
               </div>
-              <h2 className="line-height-1 text-900 text-4xl font-normal">
-                Congue Quisque Egestas
-              </h2>
+              <h2 className="line-height-1 text-900 text-4xl font-normal">Smart Reminders</h2>
               <span
                 className="text-700 text-2xl line-height-3 ml-0 md:ml-2"
                 style={{ maxWidth: "650px" }}
               >
-                Lectus arcu bibendum at varius vel pharetra vel turpis nunc. Eget aliquet nibh
-                praesent tristique magna sit amet purus gravida. Sit amet mattis vulputate enim
-                nulla aliquet.
+                <p>Never miss a deadline with Taskify Me's Smart Reminders.</p>
+
+                <p>
+                  This feature allows you to set custom notifications for each task, ensuring you're
+                  always reminded at the right time.
+                </p>
+                <p>
+                  Whether it’s a daily to-do or a one-time project, Smart Reminders keep you on
+                  track and reduce the chances of forgetting important tasks.
+                </p>
               </span>
             </div>
           </div>
@@ -462,37 +488,58 @@ const Homepage = () => {
           <div className="grid my-8 pt-2 md:pt-8">
             <div className="col-12 lg:col-6 my-auto flex flex-column text-center lg:text-left lg:align-items-start">
               <div
-                className="flex align-items-center justify-content-center bg-yellow-200 align-self-center lg:align-self-start"
+                className="flex align-items-center justify-content-center bg-primary-500 align-self-center lg:align-self-start"
                 style={{
                   width: "4.2rem",
                   height: "4.2rem",
                   borderRadius: "10px",
                 }}
               >
-                <i className="pi pi-fw pi-desktop text-5xl text-yellow-700"></i>
+                <i className="pi pi-fw pi-pencil text-5xl text-pink-100"></i>
               </div>
-              <h2 className="line-height-1 text-900 text-4xl font-normal">
-                Celerisque Eu Ultrices
-              </h2>
+              <h2 className="line-height-1 text-900 text-4xl font-normal">Customization</h2>
               <span
                 className="text-700 text-2xl line-height-3 mr-0 md:mr-2"
                 style={{ maxWidth: "650px" }}
               >
-                Adipiscing commodo elit at imperdiet dui. Viverra nibh cras pulvinar mattis nunc sed
-                blandit libero. Suspendisse in est ante in. Mauris pharetra et ultrices neque ornare
-                aenean euismod elementum nisi.
+                {" "}
+                <p>
+                  Tailor Taskify Me to fit your unique workflow with our powerful customization
+                  options.
+                </p>
+                <p>
+                  From personalized task categories to color-coded labels, you can organize your
+                  to-dos in a way that suits your style.
+                </p>
+                <p>
+                  Adjust layouts, set custom priorities, and even choose how your reminders
+                  appear—making Taskify Me truly your own personal productivity tool.
+                </p>
               </span>
             </div>
 
             <div
-              className="flex justify-content-end flex-order-1 sm:flex-order-2 col-12 lg:col-6 bg-yellow-100 p-0"
-              style={{ borderRadius: "8px" }}
+              className="flex justify-content-center  flex-order-1 sm:flex-order-2 col-12 lg:col-6 bg-primary-500"
+              style={{
+                borderRadius: "8px",
+                alignItems: "flex-end",
+                paddingRight: "5%",
+                paddingLeft: "5%",
+              }}
             >
-              <img src="/images/landing/mockup-desktop.svg" className="w-11" alt="mockup" />
+              <img
+                src="/images/home/mockup-tablet.png"
+                className="w-11 align-bottom"
+                alt="mockup"
+                style={{
+                  maxHeight: "95%",
+                  marginBottom: "-10%",
+                }}
+              />
             </div>
           </div>
         </div>
-
+        {/* 
         <div id="pricing" className="py-4 px-4 lg:px-8 my-2 md:my-4">
           <div className="text-center">
             <h2 className="text-900 font-normal mb-2">Matchless Pricing</h2>
@@ -613,9 +660,9 @@ const Homepage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
-        <div className="py-4 px-4 mx-0 mt-8 lg:mx-8">
+        {/* <div className="py-4 px-4 mx-0 mt-8 lg:mx-8">
           <div className="grid justify-content-between">
             <div className="col-12 md:col-2" style={{ marginTop: "-1.5rem" }}>
               <Link
@@ -691,7 +738,7 @@ const Homepage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

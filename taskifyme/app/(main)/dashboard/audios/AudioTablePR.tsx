@@ -6,14 +6,14 @@ import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
 import FileUploadPR from "./FileUploadPR";
 import { Toast } from "primereact/toast";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 //
 import { AudioFile } from "@/app/lib/mongodb/models";
 import AudioPlayer from "./AudioPlayer";
 import TranscribeButton from "./TranscribeButton";
 import ProcessTextButton from "./ProcessTextButton";
 import { fetchUserAudioFiles } from "@/app/services/userService";
-import { deleteAudioFile } from "@/app/services/audioFileService";
+import { deleteAudioFile, fetchAudioFile } from "@/app/services/audioFileService";
 
 interface Props {
   userId: string;
@@ -45,6 +45,22 @@ const AudioTablePR = ({ userId }: Props) => {
     };
     getAudioFiles();
   }, [refreshAudioTable]);
+
+  const handleUpdateAudioFile = useCallback((updatedAudioFile: AudioFile) => {
+    const getAudioFile = async () => {
+      try {
+        const data = await fetchAudioFile(updatedAudioFile._id);
+
+        setAudioFiles((prevFiles) =>
+          prevFiles.map((file) => (file._id === updatedAudioFile._id ? data : file))
+        );
+      } catch (err) {
+        console.error("Error fetching updated audio file:", err);
+        setError("Failed to load audio file");
+      }
+    };
+    getAudioFile();
+  }, []);
 
   // Function to parse the file name and extract the date and initial file name
   const parseFileName = (fileName: string) => {
@@ -126,7 +142,7 @@ const AudioTablePR = ({ userId }: Props) => {
   };
 
   const actionTranscribeBodyTemplate = (rowData: AudioFile) => {
-    return <TranscribeButton audioFile={rowData} />;
+    return <TranscribeButton audioFile={rowData} onTranscriptionComplete={handleUpdateAudioFile} />;
   };
 
   const actionProcessBodyTemplate = (rowData: AudioFile) => {

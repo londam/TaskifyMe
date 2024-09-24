@@ -1,3 +1,4 @@
+import { AudioFile } from "../lib/mongodb/models";
 import { handleError } from "../utils/errorHandler";
 
 const deleteAudioFromDB = async (audioFileId: string): Promise<void> => {
@@ -39,4 +40,16 @@ const deleteAudioFromWebDisk = async (fileName: string): Promise<void> => {
 export const deleteAudioFile = async (audioFileId: string, fileName: string) => {
   await deleteAudioFromDB(audioFileId);
   await deleteAudioFromWebDisk(fileName);
+};
+
+export const fetchAudioFile = async (audioFileId: string): Promise<AudioFile> => {
+  const response = await fetch(`/api/audios/${audioFileId}`);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to fetch audio files");
+  }
+
+  return data;
 };

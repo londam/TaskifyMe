@@ -103,12 +103,14 @@ const Homepage = () => {
               </li>
             </ul>
             <div className="flex justify-content-between lg:block border-top-1 lg:border-top-none surface-border py-3 lg:py-0 mt-3 lg:mt-0">
-              <Button
-                label="Login"
-                text
-                rounded
-                className="border-none font-light line-height-2 text-blue-500"
-              ></Button>
+              <Link href="/auth/login">
+                <Button
+                  label="Login"
+                  text
+                  rounded
+                  className="border-none font-light line-height-2 text-blue-500"
+                ></Button>
+              </Link>
               <Button
                 label="Register"
                 rounded

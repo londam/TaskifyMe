@@ -10,16 +10,17 @@ import { updateSTTtContentToDB } from "@/app/services/sttService";
 //
 interface Props {
   audioFile: AudioFile;
+  onTranscriptionComplete: (updatedAudioFile: AudioFile) => void;
 }
 //
-export default function TranscribeButton({ audioFile }: Props) {
+export default function TranscribeButton({ audioFile, onTranscriptionComplete }: Props) {
   const { fileName, userId, _id: audioFileId } = audioFile;
   const [sttContent, setSttContent] = useState<string>("");
   const [visible, setVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
   //
   const [isTranscribing, setIsTranscribing] = useState(false); // Track transcription state
-  const POLLING_INTERVAL = 2500; // Poll every 5 seconds
+  const POLLING_INTERVAL = 5000; // Poll every 5 seconds
   const toast = useRef<Toast>(null);
 
   const handleShowingTranscription = async () => {
@@ -101,7 +102,8 @@ export default function TranscribeButton({ audioFile }: Props) {
         if (data.status === "completed") {
           // Stop polling when transcription is completed
           clearInterval(polling);
-          audioFile.sttId = data.sttId; // Update the transcription content in state
+          //audioFile.sttId = data.sttId; // Update the transcription content in state
+          onTranscriptionComplete(audioFile); //Let parent handle updating since he's the owner!
           setIsTranscribing(false); // Update state to show transcription is done
           console.log("Transcription completed:", data.transcript);
         }
